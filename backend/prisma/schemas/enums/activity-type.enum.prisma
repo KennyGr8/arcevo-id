@@ -1,0 +1,6 @@
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  MFA_ENABLED
+  PASSWORD_RESET
+}

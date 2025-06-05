@@ -1,0 +1,6 @@
+packages:
+  - 'backend'
+  - 'backend/auth-kit-core'
+  - 'frontend'
+  - 'frontend/auth-kit-ui/*'
+  - 'scripts'

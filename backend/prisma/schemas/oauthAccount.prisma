@@ -1,0 +1,15 @@
+model OAuthAccount {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  provider       OAuthProvider
+  providerUserId String
+  accessToken    String?
+  refreshToken   String?
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@index([provider])
+}

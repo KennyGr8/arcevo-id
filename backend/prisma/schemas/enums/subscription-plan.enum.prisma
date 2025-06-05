@@ -1,0 +1,7 @@
+enum SubscriptionPlan {
+  FREE
+  PREMIUM
+  PRO
+  ENTERPRISE
+	EDUCATOR
+}

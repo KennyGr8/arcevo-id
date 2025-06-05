@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,                          // Emit JS during build
+    "outDir": "auth-kit-core/dist",           // Output directory
+    "declaration": true,                      // Generate type declarations
+    "declarationMap": true,                   // Source maps for declarations
+    "sourceMap": true,                        // Enable source maps
+    "removeComments": true,                   // Clean output
+    "emitDeclarationOnly": false             // Emit both JS and declarations
+  },
+  "include": [
+    "auth-kit-core/src/**/*"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "node_modules",
+    "auth-kit-core/dist"
+  ]
+}

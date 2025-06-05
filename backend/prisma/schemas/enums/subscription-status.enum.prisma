@@ -1,0 +1,7 @@
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  TRIALING
+  EXPIRED
+	RENEWED
+}

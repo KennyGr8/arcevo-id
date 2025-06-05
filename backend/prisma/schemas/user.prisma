@@ -1,0 +1,33 @@
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  emailVerified DateTime?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  isDeactivated Boolean   @default(false)
+  deletedAt     DateTime? 
+  status        UserStatus @default(active)
+
+  // Relations
+  authLogs     AuthLog[]
+  sessions     Session[]
+  mfa          MFA?
+  activityLogs ActivityLog[]
+  accounts     OAuthAccount[]
+  tokens       EmailToken[]
+  subscription Subscription?
+  auditLogs    AdminAuditLog[] @relation("UserToAdminAuditLog")
+
+  organizationInvitesSent OrganizationInvite[] @relation("InviteInvitedBy")
+  organizationMemberships OrganizationMembership[]
+  organizationMembershipsInvited OrganizationMembership[] @relation("MembershipInvitedBy")
+
+  billingEvents BillingEvent[]
+
+  @@index([status])
+  @@index([createdAt])
+}

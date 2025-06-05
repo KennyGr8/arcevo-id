@@ -1,0 +1,6 @@
+export enum TokenType {
+  VERIFY_EMAIL = "VERIFY_EMAIL",
+  RESET_PASSWORD = "RESET_PASSWORD",
+  MAGIC_LINK = "MAGIC_LINK",
+  TOTP = "TOTP",
+}

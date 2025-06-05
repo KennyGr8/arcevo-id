@@ -1,0 +1,5 @@
+enum BillingProvider {
+  STRIPE
+  PAYSTACK
+  LEMONSQUEEZY
+}

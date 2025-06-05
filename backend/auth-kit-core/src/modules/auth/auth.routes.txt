@@ -1,0 +1,33 @@
+// Auth
+authRoutes.post('/register', asyncHandler(authController.register))
+authRoutes.post('/login', asyncHandler(authController.login))
+authRoutes.post('/logout', authenticateJWT, asyncHandler(authController.logout))
+authRoutes.get('/refresh', asyncHandler(authController.refreshToken))
+
+// Password
+authRoutes.post('/password/forgot', asyncHandler(authController.forgotPassword))
+authRoutes.post('/password/reset', asyncHandler(authController.resetPassword))
+
+// Email
+authRoutes.post('/verify/email', asyncHandler(authController.verifyEmail))
+authRoutes.post('/update/email', authenticateJWT, asyncHandler(authController.updateEmail))
+
+authRoutes.post('/verify/email/resend', authController.resendVerificationEmail)
+authRoutes.post('/update/email/confirm', authController.confirmEmailChange)
+
+// Account
+authRoutes.post('/deactivate', authenticateJWT, authController.deactivateAccount)
+authRoutes.post('/reactivate', authController.reactivateAccount)
+authRoutes.delete('/delete', authenticateJWT, authController.deleteAccount)
+authRoutes.post('/password/change', authenticateJWT, authController.changePassword)
+
+// Debug
+authRoutes.get('/debug/token', authController.getDecodedToken)
+authRoutes.get('/debug/user', authenticateJWT, authController.getUserFromToken)
+authRoutes.get('/check', authenticateJWT, authController.checkAuthStatus)
+
+// OAuth & Logs
+authRoutes.get('/oauth/:provider', authController.oauthRedirect)
+authRoutes.get('/oauth/:provider/callback', authController.oauthCallback)
+authRoutes.get('/activity', authenticateJWT, authController.getActivityLogs)
+authRoutes.post('/refresh/revoke', authenticateJWT, authController.revokeRefreshToken)

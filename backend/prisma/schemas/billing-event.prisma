@@ -1,0 +1,20 @@
+model BillingEvent {
+  id             String               @id @default(uuid())
+  userId         String
+  user           User                 @relation(fields: [userId], references: [id])
+
+  subscriptionId String
+  subscription   Subscription         @relation(fields: [subscriptionId], references: [id])
+
+  eventType      BillingEventType
+  provider       SubscriptionProvider
+  status         String?              // Optional result (e.g., "success", "failed", etc.)
+  metadata       Json?                // Flexible provider-specific payload
+
+  createdAt      DateTime             @default(now())
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([eventType])
+  @@index([createdAt])
+}

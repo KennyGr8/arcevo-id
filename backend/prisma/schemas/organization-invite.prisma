@@ -1,0 +1,18 @@
+model OrganizationInvite {
+  id             String    @id @default(uuid())
+  email          String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  role           OrganizationRole @default(MEMBER)
+  invitedById    String?
+  invitedBy      User?       @relation("InviteInvitedBy", fields: [invitedById], references: [id])
+
+  token          String     @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime   @default(now())
+
+  @@index([organizationId])
+  @@index([email])
+}

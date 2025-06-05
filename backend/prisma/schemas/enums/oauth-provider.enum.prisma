@@ -1,0 +1,15 @@
+enum OAuthProvider {
+  GITHUB
+  GOOGLE
+  DISCORD
+}
+
+enum SocialOAuthProvider {
+	FACEBOOK
+	LINKEDIN
+}
+
+enum Web3OAuthProvider {
+	METAMASK
+	BITCOIN
+}

@@ -1,0 +1,7 @@
+model OrganizationDomain {
+  id             String        @id @default(uuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  domain         String        @unique
+  verified       Boolean       @default(false)
+}

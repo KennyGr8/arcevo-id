@@ -1,0 +1,26 @@
+model Session {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  ip              String?
+  userAgent       String?
+  deviceName      String?
+  platform        String?
+  browser         String?
+  locationCity    String?
+  locationCountry String?
+  fingerprint     String?
+  createdAt       DateTime  @default(now())
+  lastActiveAt    DateTime? 
+  expiresAt       DateTime
+  valid           Boolean   @default(true)
+  refreshToken    String? 
+
+  firstSeenAt     DateTime? 
+  lastUsedAt      DateTime? 
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@index([expiresAt])
+  @@index([valid])
+}

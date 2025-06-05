@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["auth-kit-core/src/*"],
+      "@types/*": ["auth-kit-core/src/@types/*"],
+      "@generated/*": ["auth-kit-core/src/generated/*"],
+      "@core/*": ["auth-kit-core/src/core/*"],
+      "@interfaces/*": ["auth-kit-core/src/core/interfaces/*"],
+      "@common/*": ["auth-kit-core/src/common/*"],
+      "@utils/*": ["auth-kit-core/src/common/utils/*"],
+      "@strategies/*": ["auth-kit-core/src/common/strategies/*"],
+      "@validators/*": ["auth-kit-core/src/common/validators/*"],
+      "@enums/*": ["auth-kit-core/src/common/constants/enums/*"],
+      "@prisma-enums/*": ["auth-kit-core/src/common/constants/prisma-enums/*"],
+      "@database/*": ["auth-kit-core/src/database/*"],
+      "@config/*": ["auth-kit-core/src/common/configs/*"],          // ✅ Fixed path
+      "@modules/*": ["auth-kit-core/src/modules/*"],
+      "@middleware/*": ["auth-kit-core/src/middleware/*"],
+      "@mailers/*": ["auth-kit-core/src/mailers/*"],
+      "@scripts/*": ["scripts/*"],
+      "@adapters/*": ["adapters/*"],
+      "@prisma/*": ["prisma/*"]
+    }
+  }
+}

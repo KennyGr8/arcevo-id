@@ -1,0 +1,6 @@
+export enum ActivityType {
+  LOGIN = "LOGIN",
+  LOGOUT = "LOGOUT",
+  MFA_ENABLED = "MFA_ENABLED",
+  PASSWORD_RESET = "PASSWORD_RESET",
+}

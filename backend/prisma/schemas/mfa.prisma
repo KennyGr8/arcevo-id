@@ -1,0 +1,24 @@
+model MFA {
+  id          String            @id @default(uuid())
+  userId      String            @unique
+  user        User              @relation(fields: [userId], references: [id])
+  secret      String
+  enabled     Boolean           @default(false)
+  verifiedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  backupCodes MFA_BackupCode[]
+
+  @@index([enabled])
+}
+
+model MFA_BackupCode {
+  id     String   @id @default(uuid())
+  code   String
+  usedAt DateTime?
+  mfaId  String
+  mfa    MFA      @relation(fields: [mfaId], references: [id])
+
+  @@index([mfaId])
+  @@index([usedAt])
+}
+

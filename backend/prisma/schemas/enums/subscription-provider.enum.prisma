@@ -1,0 +1,5 @@
+enum SubscriptionProvider {
+  STRIPE
+  PAYSTACK
+  LEMONSQUEEZY
+}

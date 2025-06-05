@@ -1,0 +1,13 @@
+model AdminAuditLog {
+  id        String   @id @default(uuid())
+  action    AdminAction
+  actorId   String?
+  actor     User?    @relation("UserToAdminAuditLog", fields: [actorId], references: [id])
+  target    String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+}

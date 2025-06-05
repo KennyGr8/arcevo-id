@@ -1,0 +1,6 @@
+enum TokenType {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  MAGIC_LINK
+  TOTP
+}
