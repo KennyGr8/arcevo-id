@@ -10,11 +10,13 @@
   "workspaces": [
     "auth-kit-core"
   ],
-  "tsx": {
-    "tsconfig": "./tsconfig.json"
+  "ts-node": {
+    "project": "../tsconfig.build.json",
+    "esm": true,
+    "transpileOnly": true
   },
   "scripts": {
-    "dev": "tsx --tsconfig tsconfig.json auth-kit-core/src/index.t",
+    "dev": "tsx -r tsconfig-paths/register src/index.ts",
     "build": "tsc -p auth-kit-core && cpy auth-kit-core/package.json auth-kit-core/dist --rename=package.json",
     "start": "node auth-kit-core/dist/index.js",
     "test": "jest --passWithNoTests",

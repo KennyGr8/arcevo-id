@@ -1,3 +1,0 @@
-# voltix-nexa-auth
-
-Advanced plug-and-play authentication system...

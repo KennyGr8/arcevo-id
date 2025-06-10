@@ -1,20 +1,20 @@
 {
   "name": "@voltix/auth-kit-core",
-  "version": "0.1.0-alpha.0",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "files": ["dist"],
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
-    }
-  },
   "scripts": {
-    "build": "tsc -p ../tsconfig.build.json"
+    "dev": "tsx -r tsconfig-paths/register src/index.ts",
+    "build": "tsc -p tsconfig.json"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.11.1",
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.0"
   }
 }

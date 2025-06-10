@@ -1,7 +1,7 @@
 packages:
   - "auth-kit-core"
-  - "frontend/*"
-  - "backend"
   - "backend/*"
-  - "scripts"
-  - "prisma"
+  - "scripts/*"
+  - "prisma/*"
+  - "adapters/*"
+  - "cli"
