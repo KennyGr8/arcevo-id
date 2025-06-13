@@ -5,13 +5,15 @@ export enum SubscriptionStatus {
   CANCELED = 'CANCELED',
   TRIALING = 'TRIALING',
   EXPIRED = 'EXPIRED',
+  RENEWED = 'RENEWED',
 }
 
 export type SubscriptionStatusValues =
   | 'ACTIVE'
   | 'CANCELED'
   | 'TRIALING'
-  | 'EXPIRED';
+  | 'EXPIRED'
+  | 'RENEWED';
 
 // ✅ Type-safe helper (optional)
 /**

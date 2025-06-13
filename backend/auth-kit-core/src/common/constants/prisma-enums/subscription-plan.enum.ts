@@ -5,9 +5,15 @@ export enum SubscriptionPlan {
   PREMIUM = 'PREMIUM',
   PRO = 'PRO',
   ENTERPRISE = 'ENTERPRISE',
+  EDUCATOR = 'EDUCATOR',
 }
 
-export type SubscriptionPlanValues = 'FREE' | 'PREMIUM' | 'PRO' | 'ENTERPRISE';
+export type SubscriptionPlanValues =
+  | 'FREE'
+  | 'PREMIUM'
+  | 'PRO'
+  | 'ENTERPRISE'
+  | 'EDUCATOR';
 
 // ✅ Type-safe helper (optional)
 /**

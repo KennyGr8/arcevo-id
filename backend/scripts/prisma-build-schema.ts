@@ -1,170 +1,128 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import glob from 'fast-glob';
-import chokidar from 'chokidar';
+import 'dotenv/config';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// Config
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ROOT_DIR = path.resolve(__dirname, '../prisma/schemas');
-const OUTPUT_PATH = path.resolve(__dirname, '../prisma/schema.prisma');
-const DRY_RUN = process.argv.includes('--dry-run');
-const WATCH = process.argv.includes('--watch');
+const schemaHeader = `// THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
+// Modify individual schema parts in the prisma/schemas directory.
 
-const prismaFiles = () =>
-  glob.sync('**/*.prisma', {
-    cwd: ROOT_DIR,
-    absolute: true,
-  });
-
-const seenDefinitions = new Set<string>();
-const GENERATOR_BLOCK = `
 generator client {
   provider = "prisma-client-js"
+  output   = "../auth-kit-core/src/generated/prisma"
 }
-`;
 
-const DATASOURCE_BLOCK = `
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-`;
 
-function extractBlocks(filePath: string, content: string): string[] {
-  const blocks: string[] = [];
-  const lines = content.split('\n');
+generator seed {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}`.trim();
 
-  let currentBlock = '';
-  let blockName = '';
-  let blockType: 'model' | 'enum' | null = null;
-  let insideBlock = false;
-  let members: string[] = [];
+/**
+ * Recursively gets all files ending with the given extension
+ */
+async function getPrismaFilesRecursive(dir: string, extension: string): Promise<string[]> {
+  const result: string[] = [];
 
-  for (let line of lines) {
-    const trimmed = line.trim();
+  async function traverse(currentDir: string) {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true });
 
-    if (/^(model|enum)\s+\w+/.test(trimmed)) {
-      insideBlock = true;
-      currentBlock = line;
-      const [type, name] = trimmed.split(/\s+/);
-      blockType = type as 'model' | 'enum';
-      blockName = name;
-      members = [];
-    } else if (insideBlock) {
-      currentBlock += '\n' + line;
-      if (blockType === 'enum' && /^[A-Z0-9_]+$/.test(trimmed) && !trimmed.startsWith('//')) {
-        members.push(trimmed);
-      }
-      if (trimmed === '}') {
-        insideBlock = false;
-
-        if (!seenDefinitions.has(blockName)) {
-          seenDefinitions.add(blockName);
-
-          const relative = path.relative(path.resolve(__dirname, '..'), filePath).replace(/\\/g, '/');
-          if (blockType === 'enum') {
-            const sortedEnum = `enum ${blockName} {\n  ${[...new Set(members)].sort().join('\n  ')}\n}`;
-            blocks.push(`// --- File: ${relative} ---\n${sortedEnum}`);
-          } else {
-            blocks.push(`// --- File: ${relative} ---\n${currentBlock}`);
-          }
-        } else {
-          console.warn(`⚠️  Skipped duplicate: ${blockName} from ${filePath}`);
-        }
-
-        currentBlock = '';
-        blockName = '';
-        blockType = null;
-        members = [];
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await traverse(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith(extension)) {
+        result.push(fullPath);
       }
     }
   }
 
-  return blocks;
+  await traverse(dir);
+  return result.sort(); // consistent order
 }
 
-function validatePrismaBlock(content: string, filePath: string) {
-  const errors: string[] = [];
+/**
+ * Build Prisma schema by combining schema and enum files
+ */
+export async function buildSchema(dryRun = false) {
+  try {
+    const schemasDir = path.resolve(__dirname, '../prisma/schemas');
+    const enumsDir = path.resolve(schemasDir, 'enums');
+    const outputFile = path.resolve(__dirname, '../prisma/schema.prisma');
 
-  const modelRegex = /model\s+(\w+)\s+\{([\s\S]*?)\}/g;
-  const enumRegex = /enum\s+(\w+)\s+\{([\s\S]*?)\}/g;
+    console.log(`🔍 Scanning schemas in: ${schemasDir}`);
+    console.log(`🔍 Scanning enums in: ${enumsDir}`);
 
-  for (const match of content.matchAll(modelRegex)) {
-    const [, modelName, body] = match;
-    if (!body.includes('@id')) {
-      errors.push(`Model "${modelName}" in ${filePath} is missing an @id field`);
+    const enumFiles = await getPrismaFilesRecursive(enumsDir, '.enum.prisma');
+    const schemaFiles = await getPrismaFilesRecursive(schemasDir, '.prisma');
+
+    if (enumFiles.length === 0 && schemaFiles.length === 0) {
+      console.warn('⚠️ No schema or enum files found.');
+      return;
     }
-  }
 
-  for (const match of content.matchAll(enumRegex)) {
-    const [, enumName, body] = match;
-    const lines = body.trim().split('\n');
-    for (let line of lines) {
-      if (!/^[A-Z0-9_]+$/.test(line.trim()) && line.trim()) {
-        errors.push(`Enum "${enumName}" in ${filePath} has invalid member: "${line.trim()}"`);
-      }
+    const allFiles = [...enumFiles, ...schemaFiles];
+
+    const seen = new Set<string>();
+    const parts: string[] = [];
+
+    for (const filePath of allFiles) {
+      const content = await fs.readFile(filePath, 'utf-8');
+
+      const relativePath = path.relative(path.resolve(__dirname, '../'), filePath);
+      const sanitizedContent = content
+        .replace(/generator\s+\w+\s+\{[^}]*\}/g, '')
+        .replace(/datasource\s+\w+\s+\{[^}]*\}/g, '')
+        .trim();
+
+      if (!sanitizedContent || seen.has(sanitizedContent)) continue;
+
+      seen.add(sanitizedContent);
+      parts.push(`// --- File: ${relativePath} ---\n\n${sanitizedContent}`);
     }
-  }
 
-  return errors;
-}
+    const finalSchema = [schemaHeader, ...parts].join('\n\n');
 
-function generateSchema() {
-  seenDefinitions.clear();
-  const outputSections: string[] = [];
-  const allFiles = prismaFiles();
-  let validationErrors: string[] = [];
-
-  for (const file of allFiles) {
-    const raw = fs.readFileSync(file, 'utf8').trim();
-
-    // Skip generator/datasource blocks
-    if (/^(generator|datasource)\s+\w+\s+\{[\s\S]*?\}/m.test(raw)) continue;
-
-    const lintErrors = validatePrismaBlock(raw, file);
-    if (lintErrors.length) validationErrors.push(...lintErrors);
-
-    const extracted = extractBlocks(file, raw);
-    outputSections.push(...extracted);
-  }
-
-  if (validationErrors.length > 0) {
-    console.error('❌ Linting Errors:');
-    for (const err of validationErrors) {
-      console.error(`  - ${err}`);
+    if (dryRun) {
+      console.log('💡 [Dry Run] Final schema output:\n');
+      console.log(finalSchema);
+    } else {
+      await fs.writeFile(outputFile, finalSchema);
+      console.log(`✅ schema.prisma generated at ${outputFile}`);
     }
-    return;
-  }
-
-  const finalSchema = `// THIS FILE IS AUTO-GENERATED. DO NOT EDIT MANUALLY.
-
-${GENERATOR_BLOCK.trim()}
-
-${DATASOURCE_BLOCK.trim()}
-
-${outputSections.join('\n\n')}
-`;
-
-  if (DRY_RUN) {
-    console.log(finalSchema);
-  } else {
-    fs.writeFileSync(OUTPUT_PATH, finalSchema);
-    console.log('✅ schema.prisma generated.');
+  } catch (err) {
+    console.error('❌ Error building schema:', err instanceof Error ? err.stack : err);
+    throw err;
   }
 }
 
-if (WATCH) {
-  console.log('👀 Watching for changes...');
-  chokidar.watch(ROOT_DIR, { ignoreInitial: false }).on('all', () => {
-    try {
-      generateSchema();
-    } catch (err) {
-      console.error('❌ Error generating schema:', err);
-    }
-  });
-} else {
-  generateSchema();
+// --- CLI Entrypoint ---
+if (process.argv[1].endsWith('prisma-build-schema.ts') || process.argv[1].endsWith('prisma-build-schema.js')) {
+  if (!process.env.DATABASE_URL) {
+    console.error('❌ DATABASE_URL is not set.');
+    process.exit(1);
+  }
+
+  const dryRun = process.argv.includes('--dry');
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('⚠️ Running Prisma schema builder in development mode.');
+  }
+
+  console.log(`🛠 Starting Prisma schema build ${dryRun ? '(Dry Run Mode)' : ''}...`);
+
+  buildSchema(dryRun)
+    .then(() => {
+      if (!dryRun) console.log('✅ schema.prisma build completed!');
+    })
+    .catch((err) => {
+      console.error('❌ Failed to build Prisma schema:', err);
+      process.exit(1);
+    });
 }
