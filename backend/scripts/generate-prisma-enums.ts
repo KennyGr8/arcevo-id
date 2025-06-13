@@ -1,9 +1,11 @@
-// scripts/generate-prisma-enums.ts
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
+import { format as prettierFormat } from 'prettier';
+import { logger } from '@utils/logger';
 
-const schemaPath = path.resolve('prisma/schema.prisma');
-const outputDir = path.resolve('auth-kit-core/src/common/constants/prisma-enums');
+const SCHEMA_PATH = path.resolve('prisma/schema.prisma');
+const OUTPUT_DIR = path.resolve('auth-kit-core/src/common/constants/prisma-enums');
 
 function toPascalCase(input: string) {
   return input
@@ -11,7 +13,7 @@ function toPascalCase(input: string) {
     .replace(/^[a-z]/, c => c.toUpperCase());
 }
 
-function extractEnumsFromSchema(schema: string) {
+function extractEnums(schema: string) {
   const enumRegex = /enum\s+(\w+)\s*{([^}]*)}/g;
   const enums: { name: string; values: string[] }[] = [];
   let match;
@@ -20,61 +22,113 @@ function extractEnumsFromSchema(schema: string) {
     const [, name, body] = match;
     const values = body
       .split('\n')
-      .map(line => line.trim())
+      .map(line => line.split('=')[0].trim())
       .filter(Boolean)
       .filter(v => !v.startsWith('//'));
-
     enums.push({ name, values });
   }
 
   return enums;
 }
 
-function generateEnumFileContent(enumName: string, values: string[]) {
-  const lines = values.map(val => `  ${val} = "${val}",`);
-  return `export enum ${enumName} {\n${lines.join('\n')}\n}\n`;
+function getEnumFilename(name: string) {
+  return name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() + '.enum.ts';
 }
 
-function getEnumFilename(enumName: string) {
-  return enumName
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .toLowerCase()
-    .concat('.enum.ts');
+function generateEnumContent(enumName: string, values: string[]) {
+  const pascal = toPascalCase(enumName);
+  const body = values.map(v => `  ${v} = "${v}",`).join('\n');
+  const type = `export type ${pascal}Values = ${values.map(v => `"${v}"`).join(' | ')};`;
+
+  const validator = `
+// ✅ Type-safe helper (optional)
+/**
+ * Returns true if value is a valid ${pascal} enum value
+ */
+export function is${pascal}(value: string): value is ${pascal}Values {
+  return Object.values(${pascal}).includes(value as ${pascal});
+}
+`;
+
+  return `// Auto-generated from Prisma schema. Do not edit manually.
+
+export enum ${pascal} {
+${body}
 }
 
-function writeEnumsToFiles(enums: { name: string; values: string[] }[]) {
-  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+${type}
+${validator}
+`;
+}
+
+async function formatWithPrettier(content: string): Promise<string> {
+  return prettierFormat(content, {
+    parser: 'typescript',
+    semi: true,
+    singleQuote: true,
+    trailingComma: 'all',
+  });
+}
+
+async function writeEnums(enums: { name: string; values: string[] }[]) {
+  if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   for (const { name, values } of enums) {
-    const pascalName = toPascalCase(name);
-    const filename = getEnumFilename(name);
-    const filePath = path.join(outputDir, filename);
-    const content = generateEnumFileContent(pascalName, values);
-    fs.writeFileSync(filePath, content, 'utf-8');
-    console.log(`✅ Wrote ${filePath}`);
+    const file = path.join(OUTPUT_DIR, getEnumFilename(name));
+    const rawContent = generateEnumContent(name, values);
+    const content = await formatWithPrettier(rawContent);
+    fs.writeFileSync(file, content, 'utf8');
+    logger.info(`✅ Wrote ${path.relative(process.cwd(), file)}`);
   }
 }
 
-function updateIndexFile(enums: { name: string }[]) {
-  const indexPath = path.join(outputDir, 'index.ts');
-  const lines = enums.map(({ name }) => {
-    const file = './' + getEnumFilename(name).replace(/\.ts$/, '');
-    return `export * from '${file}';`;
-  });
-  fs.writeFileSync(indexPath, lines.join('\n') + '\n', 'utf-8');
-  console.log(`✅ Updated index.ts with all exports`);
+async function updateIndex(enums: { name: string }[]) {
+  const indexPath = path.join(OUTPUT_DIR, 'index.ts');
+  const exports = Array.from(
+    new Set(
+      enums.map(({ name }) => `export * from './${getEnumFilename(name).replace(/\.ts$/, '')}';`)
+    )
+  ).sort();
+
+  const rawContent = exports.join('\n') + '\n';
+  const content = await formatWithPrettier(rawContent);
+  fs.writeFileSync(indexPath, content, 'utf8');
+
+  logger.success(
+    `📦 Enums index generated (${exports.length} exports) → ${path.relative(process.cwd(), indexPath)}`
+  );
 }
 
-function main() {
-  const schema = fs.readFileSync(schemaPath, 'utf-8');
-  const enums = extractEnumsFromSchema(schema);
+function gitAutoCommit(commitMsg = 'chore: regenerate prisma enums') {
+  try {
+    execSync('git add .', { stdio: 'ignore' });
+    execSync(`git commit -m "${commitMsg}"`, { stdio: 'ignore' });
+    logger.success('✅ Changes committed to Git');
+  } catch {
+    logger.warn('⚠️ Git commit skipped (maybe no changes or not a Git repo)');
+  }
+}
+
+async function main() {
+  if (!fs.existsSync(SCHEMA_PATH)) {
+    logger.error(`❌ Prisma schema not found: ${SCHEMA_PATH}`);
+    process.exit(1);
+  }
+
+  const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
+  const enums = extractEnums(schema);
+
   if (enums.length === 0) {
-    console.log('No enums found in Prisma schema.');
+    logger.warn('⚠️ No enums found in schema.');
     return;
   }
 
-  writeEnumsToFiles(enums);
-  updateIndexFile(enums);
+  await writeEnums(enums);
+  await updateIndex(enums);
+  gitAutoCommit();
 }
 
-main();
+main().catch(err => {
+  logger.error(`❌ Failed to generate enums: ${err.message}`);
+  process.exit(1);
+});

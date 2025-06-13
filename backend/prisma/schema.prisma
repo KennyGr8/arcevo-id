@@ -144,6 +144,21 @@ model ActivityLog {
   @@index([createdAt])
 }
 
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    ActivityType
+  ip        String?
+  metadata  Json?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
 model AdminAuditLog {
   id        String   @id @default(uuid())
   action    AdminAction
@@ -155,6 +170,38 @@ model AdminAuditLog {
 
   @@index([actorId])
   @@index([action])
+  @@index([createdAt])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(uuid())
+  action    AdminAction
+  actorId   String?
+  actor     User?    @relation("UserToAdminAuditLog", fields: [actorId], references: [id])
+  target    String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model AuthLog {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  event           AuthEvent
+  ip              String?
+  userAgent       String?
+  platform        String?
+  browser         String?
+  locationCity    String?
+  locationCountry String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
   @@index([createdAt])
 }
 
@@ -212,6 +259,87 @@ model EmailToken {
   @@index([expiresAt])
 }
 
+model EmailToken {
+  id        String    @id @default(uuid())
+  email     String
+  token     String    @unique
+  type      TokenType
+  expiresAt DateTime
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+  @@index([type])
+  @@index([expiresAt])
+}
+
+enum Role {
+  USER
+  PREMIUM
+  PRO
+  ADMIN
+}
+
+enum UserStatus {
+  active
+  suspended
+  banned
+}
+
+enum AdminAction {
+  USER_BAN
+  USER_UNBAN
+  ACCOUNT_DELETED
+}
+
+enum TokenType {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  MAGIC_LINK
+  TOTP
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  MFA_ENABLED
+  PASSWORD_RESET
+}
+
+enum AuthEvent {
+  LOGIN
+  LOGOUT
+  MFA_SUCCESS
+  MFA_FAILED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PREMIUM
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  TRIALING
+  EXPIRED
+}
+
+enum SubscriptionProvider {
+  STRIPE
+  PAYSTACK
+  LEMONSQUEEZY
+}
+
+enum OAuthProvider {
+  GITHUB
+  GOOGLE
+  DISCORD
+}
+
 
 
 model MFA {
@@ -236,6 +364,22 @@ model MFA_BackupCode {
 
   @@index([mfaId])
   @@index([usedAt])
+}
+
+model OAuthAccount {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  provider       OAuthProvider
+  providerUserId String
+  accessToken    String?
+  refreshToken   String?
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@index([provider])
 }
 
 model OAuthAccount {

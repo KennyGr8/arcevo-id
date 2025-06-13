@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-console.log("👀 Script started running...");
+console.log('👀 Script started running...');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,7 +32,8 @@ async function getPrismaFilesFromDir(dir: string, extension = ".prisma") {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   return entries
     .filter((entry) => entry.isFile() && entry.name.endsWith(extension))
-    .map((entry) => path.join(dir, entry.name));
+    .map((entry) => path.join(dir, entry.name))
+    .sort(); // Ensure consistent order
 }
 
 export async function buildSchema() {
@@ -44,15 +45,15 @@ export async function buildSchema() {
     console.log(`🔍 Reading schema parts from: ${schemasDir}`);
     console.log(`🔍 Reading enum parts from: ${enumsDir}`);
 
-    const schemaFiles = await getPrismaFilesFromDir(schemasDir);
     const enumFiles = await getPrismaFilesFromDir(enumsDir, ".enum.prisma");
+    const schemaFiles = await getPrismaFilesFromDir(schemasDir, ".prisma");
 
     if (schemaFiles.length === 0 && enumFiles.length === 0) {
       console.warn("⚠️ No schema or enum parts found.");
       return;
     }
 
-    const allFiles = [...enumFiles, ...schemaFiles]; // enums first, then models
+    const allFiles = [...enumFiles, ...schemaFiles];
 
     const parts = await Promise.all(
       allFiles.map(async (filePath) => {
@@ -76,20 +77,20 @@ export async function buildSchema() {
 }
 
 if (process.argv[1].endsWith("prisma-build-schema.ts")) {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn("⚠️  This script is intended for production builds only. Running in development mode.");
+  if (!process.env.DATABASE_URL) {
+    console.error("❌ DATABASE_URL is not set. Please define it in your environment.");
+    process.exit(1);
   }
 
-  if (!process.env.DATABASE_URL) {
-    console.error("❌ DATABASE_URL environment variable is not set. Please set it before running this script.");
-    process.exit(1);
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("⚠️ Running Prisma build script in development mode.");
   }
 
   console.log("🛠 Building Prisma schema...");
   buildSchema()
-    .then(() => console.log("✅ schema.prisma generated successfully!"))
+    .then(() => console.log("✅ schema.prisma build completed!"))
     .catch((err) => {
-      console.error("❌ Failed to build schema:", err instanceof Error ? err.stack : err);
+      console.error("❌ Prisma schema build failed:", err);
       process.exit(1);
     });
 }

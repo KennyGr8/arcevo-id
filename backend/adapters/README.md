@@ -1,0 +1,1 @@
+adapters/ is reserved for future extension to support multiple database or framework layers (e.g., PostgreSQL, MongoDB, Express, Fastify, etc.).

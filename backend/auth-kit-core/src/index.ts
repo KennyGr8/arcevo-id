@@ -1,4 +1,3 @@
-// auth-kit-core/index.ts
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -14,7 +13,7 @@ import { asyncHandler } from "@/middleware/asyncHandler";
 import { authenticateJWT } from "@/common/strategies/jwt.strategy";
 
 // Routes
-import routes from "@/modules"; // 🔥 All routes registered modularly
+// import routes from "@/modules"; // 🔥 All routes registered modularly
 
 // Middlewares
 import { updateSessionActivity } from "@/modules/session/middleware/updateSessionActivity";
@@ -44,10 +43,11 @@ app.get(
 );
 
 // Mount all routes under /api
-routes.forEach(({ path, router }) => app.use(`${BASE_PATH}${path}`, router));
+/* routes.forEach(({ path, router }) => app.use(`${BASE_PATH}${path}`, router));
 
 // Register all routes
 app.use(BASE_PATH, routes);
+*/
 
 // Global error handler
 app.use(errorHandler);
