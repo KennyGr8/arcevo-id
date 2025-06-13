@@ -7,13 +7,13 @@ async function runSetup() {
     await buildSchema();
 
     console.log('📜 Generating Prisma enums...');
-    execSync('ts-node scripts/generate-prisma-enums.ts', { stdio: 'inherit' });
+    execSync('tsx scripts/generate-prisma-enums.ts', { stdio: 'inherit' });
 
     console.log('🧹 Resetting database...');
-    execSync('npm run prisma:reset', { stdio: 'inherit' });
+    execSync('pnpm run prisma:reset', { stdio: 'inherit' });
 
     console.log('⚙️ Generating Prisma client...');
-    execSync('npm run prisma:generate', { stdio: 'inherit' });
+    execSync('pnpm run prisma:generate', { stdio: 'inherit' });
 
     console.log('🌱 Seeding database...');
     execSync('npm run prisma:seed', { stdio: 'inherit' });
