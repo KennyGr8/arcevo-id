@@ -477,3 +477,30 @@ model User {
 2025-06-13 12:25:54 [INFO]: 👀 Watching for changes in C:\Users\USER\Desktop\Projects\Voltix\backend\prisma\schema.prisma...
 2025-06-13 12:47:38 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\activity-type.enum.ts
 2025-06-13 12:50:16 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\activity-type.enum.ts
+2025-06-13 12:53:13 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\activity-type.enum.ts
+2025-06-13 12:53:13 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\admin-action.enum.ts
+2025-06-13 12:53:13 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\auth-event.enum.ts
+2025-06-13 12:53:13 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\billing-event-type.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\billing-provider.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\oauth-provider.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\social-oauth-provider.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\web3oauth-provider.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\organization-role.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\role.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-plan.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-provider.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-status.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\token-type.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\user-status.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\role.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\user-status.enum.ts
+2025-06-13 12:53:14 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\admin-action.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\token-type.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\activity-type.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\auth-event.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-plan.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-status.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-provider.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\oauth-provider.enum.ts
+2025-06-13 12:53:15 [INFO]: ✅ 📦 Enums index generated (15 exports) → auth-kit-core\src\common\constants\prisma-enums\index.ts
+2025-06-13 12:53:37 [INFO]: ✅ ✅ Changes committed to Git
