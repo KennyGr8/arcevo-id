@@ -16,7 +16,7 @@ async function runSetup() {
     execSync('pnpm run prisma:generate', { stdio: 'inherit' });
 
     console.log('🌱 Seeding database...');
-    execSync('npm run prisma:seed', { stdio: 'inherit' });
+    execSync('pnpm run prisma:seed', { stdio: 'inherit' });
 
     console.log('✅ Prisma setup complete!');
   } catch (err) {
