@@ -1,29 +1,14 @@
-// THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
-// Modify individual schema parts in the prisma/schemas directory.
+// AUTO-GENERATED FILE. DO NOT EDIT MANUALLY
+// Run: pnpm prisma:build-schema
 
-generator client {
-  provider = "prisma-client-js"
-  output   = "../auth-kit-core/src/generated/prisma"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-generator seed {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
-}
-
-enum ActivityType {
+ENUM ActivityType {
   LOGIN
   LOGOUT
   MFA_ENABLED
   PASSWORD_RESET
 }
 
-enum AdminAction {
+ENUM AdminAction {
   USER_BAN
   USER_UNBAN
   ACCOUNT_DELETED
@@ -33,7 +18,7 @@ enum AdminAction {
   SUBSCRIPTION_UPDATED
 }
 
-enum AuthEvent {
+ENUM AuthEvent {
   LOGIN
   LOGOUT
   MFA_SUCCESS
@@ -43,7 +28,7 @@ enum AuthEvent {
   TOKEN_EXPIRED
 }
 
-enum BillingEventType {
+ENUM BillingEventType {
   SUBSCRIPTION_CREATED
   SUBSCRIPTION_UPDATED
   SUBSCRIPTION_CANCELED
@@ -58,43 +43,38 @@ enum BillingEventType {
   PROVIDER_SYNC
 }
 
-enum BillingProvider {
+ENUM BillingProvider {
   STRIPE
   PAYSTACK
   LEMONSQUEEZY
 }
 
-enum OAuthProvider {
+ENUM OAuthProvider {
   GITHUB
   GOOGLE
   DISCORD
 }
 
-enum SocialOAuthProvider {
-	FACEBOOK
-	LINKEDIN
-}
-
-enum Web3OAuthProvider {
-	METAMASK
-	BITCOIN
-}
-
-enum OrganizationRole {
+ENUM OrganizationRole {
   OWNER
   ADMIN
   MEMBER
   GUEST
 }
 
-enum Role {
+ENUM Role {
   USER
   PREMIUM
   PRO
   ADMIN
 }
 
-enum SubscriptionPlan {
+ENUM SocialOAuthProvider {
+	FACEBOOK
+	LINKEDIN
+}
+
+ENUM SubscriptionPlan {
   FREE
   PREMIUM
   PRO
@@ -102,13 +82,13 @@ enum SubscriptionPlan {
 	EDUCATOR
 }
 
-enum SubscriptionProvider {
+ENUM SubscriptionProvider {
   STRIPE
   PAYSTACK
   LEMONSQUEEZY
 }
 
-enum SubscriptionStatus {
+ENUM SubscriptionStatus {
   ACTIVE
   CANCELED
   TRIALING
@@ -116,32 +96,22 @@ enum SubscriptionStatus {
 	RENEWED
 }
 
-enum TokenType {
+ENUM TokenType {
   VERIFY_EMAIL
   RESET_PASSWORD
   MAGIC_LINK
   TOTP
 }
 
-enum UserStatus {
-  active
-  suspended
-  banned
+ENUM UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
 }
 
-model ActivityLog {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  action    ActivityType
-  ip        String?
-  metadata  Json?
-  userAgent String?
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-  @@index([action])
-  @@index([createdAt])
+ENUM Web3OAuthProvider {
+	METAMASK
+	BITCOIN
 }
 
 model ActivityLog {
@@ -170,38 +140,6 @@ model AdminAuditLog {
 
   @@index([actorId])
   @@index([action])
-  @@index([createdAt])
-}
-
-model AdminAuditLog {
-  id        String   @id @default(uuid())
-  action    AdminAction
-  actorId   String?
-  actor     User?    @relation("UserToAdminAuditLog", fields: [actorId], references: [id])
-  target    String?
-  meta      Json?
-  createdAt DateTime @default(now())
-
-  @@index([actorId])
-  @@index([action])
-  @@index([createdAt])
-}
-
-model AuthLog {
-  id              String   @id @default(uuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  event           AuthEvent
-  ip              String?
-  userAgent       String?
-  platform        String?
-  browser         String?
-  locationCity    String?
-  locationCountry String?
-  createdAt       DateTime @default(now())
-
-  @@index([userId])
-  @@index([event])
   @@index([createdAt])
 }
 
@@ -259,89 +197,6 @@ model EmailToken {
   @@index([expiresAt])
 }
 
-model EmailToken {
-  id        String    @id @default(uuid())
-  email     String
-  token     String    @unique
-  type      TokenType
-  expiresAt DateTime
-  userId    String?
-  user      User?     @relation(fields: [userId], references: [id])
-  createdAt DateTime  @default(now())
-
-  @@index([email])
-  @@index([type])
-  @@index([expiresAt])
-}
-
-enum Role {
-  USER
-  PREMIUM
-  PRO
-  ADMIN
-}
-
-enum UserStatus {
-  active
-  suspended
-  banned
-}
-
-enum AdminAction {
-  USER_BAN
-  USER_UNBAN
-  ACCOUNT_DELETED
-}
-
-enum TokenType {
-  VERIFY_EMAIL
-  RESET_PASSWORD
-  MAGIC_LINK
-  TOTP
-}
-
-enum ActivityType {
-  LOGIN
-  LOGOUT
-  MFA_ENABLED
-  PASSWORD_RESET
-}
-
-enum AuthEvent {
-  LOGIN
-  LOGOUT
-  MFA_SUCCESS
-  MFA_FAILED
-}
-
-enum SubscriptionPlan {
-  FREE
-  PREMIUM
-  PRO
-  ENTERPRISE
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELED
-  TRIALING
-  EXPIRED
-}
-
-enum SubscriptionProvider {
-  STRIPE
-  PAYSTACK
-  LEMONSQUEEZY
-}
-
-enum OAuthProvider {
-  GITHUB
-  GOOGLE
-  DISCORD
-}
-
-
-
 model MFA {
   id          String            @id @default(uuid())
   userId      String            @unique
@@ -364,22 +219,6 @@ model MFA_BackupCode {
 
   @@index([mfaId])
   @@index([usedAt])
-}
-
-model OAuthAccount {
-  id             String    @id @default(uuid())
-  userId         String
-  user           User      @relation(fields: [userId], references: [id])
-  provider       OAuthProvider
-  providerUserId String
-  accessToken    String?
-  refreshToken   String?
-  expiresAt      DateTime?
-  createdAt      DateTime  @default(now())
-
-  @@unique([provider, providerUserId])
-  @@index([userId])
-  @@index([provider])
 }
 
 model OAuthAccount {

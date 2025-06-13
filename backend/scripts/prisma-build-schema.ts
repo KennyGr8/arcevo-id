@@ -1,96 +1,170 @@
-import 'dotenv/config';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import glob from 'fast-glob';
+import chokidar from 'chokidar';
 
-console.log('👀 Script started running...');
-
+// Config
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const schemaHeader = `
-// THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
-// Modify individual schema parts in the prisma/schemas directory.
+const ROOT_DIR = path.resolve(__dirname, '../prisma/schemas');
+const OUTPUT_PATH = path.resolve(__dirname, '../prisma/schema.prisma');
+const DRY_RUN = process.argv.includes('--dry-run');
+const WATCH = process.argv.includes('--watch');
 
+const prismaFiles = () =>
+  glob.sync('**/*.prisma', {
+    cwd: ROOT_DIR,
+    absolute: true,
+  });
+
+const seenDefinitions = new Set<string>();
+const GENERATOR_BLOCK = `
 generator client {
   provider = "prisma-client-js"
-  output   = "../auth-kit-core/src/generated/prisma"
 }
+`;
 
+const DATASOURCE_BLOCK = `
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+`;
 
-generator seed {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
-}
-`.trim();
+function extractBlocks(filePath: string, content: string): string[] {
+  const blocks: string[] = [];
+  const lines = content.split('\n');
 
-async function getPrismaFilesFromDir(dir: string, extension = ".prisma") {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(extension))
-    .map((entry) => path.join(dir, entry.name))
-    .sort(); // Ensure consistent order
-}
+  let currentBlock = '';
+  let blockName = '';
+  let blockType: 'model' | 'enum' | null = null;
+  let insideBlock = false;
+  let members: string[] = [];
 
-export async function buildSchema() {
-  try {
-    const schemasDir = path.resolve(__dirname, "../prisma/schemas");
-    const enumsDir = path.resolve(schemasDir, "enums");
-    const outputFile = path.resolve(__dirname, "../prisma/schema.prisma");
+  for (let line of lines) {
+    const trimmed = line.trim();
 
-    console.log(`🔍 Reading schema parts from: ${schemasDir}`);
-    console.log(`🔍 Reading enum parts from: ${enumsDir}`);
+    if (/^(model|enum)\s+\w+/.test(trimmed)) {
+      insideBlock = true;
+      currentBlock = line;
+      const [type, name] = trimmed.split(/\s+/);
+      blockType = type as 'model' | 'enum';
+      blockName = name;
+      members = [];
+    } else if (insideBlock) {
+      currentBlock += '\n' + line;
+      if (blockType === 'enum' && /^[A-Z0-9_]+$/.test(trimmed) && !trimmed.startsWith('//')) {
+        members.push(trimmed);
+      }
+      if (trimmed === '}') {
+        insideBlock = false;
 
-    const enumFiles = await getPrismaFilesFromDir(enumsDir, ".enum.prisma");
-    const schemaFiles = await getPrismaFilesFromDir(schemasDir, ".prisma");
+        if (!seenDefinitions.has(blockName)) {
+          seenDefinitions.add(blockName);
 
-    if (schemaFiles.length === 0 && enumFiles.length === 0) {
-      console.warn("⚠️ No schema or enum parts found.");
-      return;
+          const relative = path.relative(path.resolve(__dirname, '..'), filePath).replace(/\\/g, '/');
+          if (blockType === 'enum') {
+            const sortedEnum = `enum ${blockName} {\n  ${[...new Set(members)].sort().join('\n  ')}\n}`;
+            blocks.push(`// --- File: ${relative} ---\n${sortedEnum}`);
+          } else {
+            blocks.push(`// --- File: ${relative} ---\n${currentBlock}`);
+          }
+        } else {
+          console.warn(`⚠️  Skipped duplicate: ${blockName} from ${filePath}`);
+        }
+
+        currentBlock = '';
+        blockName = '';
+        blockType = null;
+        members = [];
+      }
     }
+  }
 
-    const allFiles = [...enumFiles, ...schemaFiles];
+  return blocks;
+}
 
-    const parts = await Promise.all(
-      allFiles.map(async (filePath) => {
-        console.log(`📄 Processing: ${filePath}`);
-        const content = await fs.readFile(filePath, "utf-8");
-        return content
-          .replace(/generator\s+\w+\s+\{[^}]*\}/g, "")
-          .replace(/datasource\s+\w+\s+\{[^}]*\}/g, "")
-          .trim();
-      })
-    );
+function validatePrismaBlock(content: string, filePath: string) {
+  const errors: string[] = [];
 
-    const finalSchema = [schemaHeader, ...parts].join("\n\n");
-    await fs.writeFile(outputFile, finalSchema);
+  const modelRegex = /model\s+(\w+)\s+\{([\s\S]*?)\}/g;
+  const enumRegex = /enum\s+(\w+)\s+\{([\s\S]*?)\}/g;
 
-    console.log(`✅ schema.prisma generated successfully at ${outputFile}`);
-  } catch (err) {
-    console.error("❌ Error inside buildSchema():", err instanceof Error ? err.stack : err);
-    throw err;
+  for (const match of content.matchAll(modelRegex)) {
+    const [, modelName, body] = match;
+    if (!body.includes('@id')) {
+      errors.push(`Model "${modelName}" in ${filePath} is missing an @id field`);
+    }
+  }
+
+  for (const match of content.matchAll(enumRegex)) {
+    const [, enumName, body] = match;
+    const lines = body.trim().split('\n');
+    for (let line of lines) {
+      if (!/^[A-Z0-9_]+$/.test(line.trim()) && line.trim()) {
+        errors.push(`Enum "${enumName}" in ${filePath} has invalid member: "${line.trim()}"`);
+      }
+    }
+  }
+
+  return errors;
+}
+
+function generateSchema() {
+  seenDefinitions.clear();
+  const outputSections: string[] = [];
+  const allFiles = prismaFiles();
+  let validationErrors: string[] = [];
+
+  for (const file of allFiles) {
+    const raw = fs.readFileSync(file, 'utf8').trim();
+
+    // Skip generator/datasource blocks
+    if (/^(generator|datasource)\s+\w+\s+\{[\s\S]*?\}/m.test(raw)) continue;
+
+    const lintErrors = validatePrismaBlock(raw, file);
+    if (lintErrors.length) validationErrors.push(...lintErrors);
+
+    const extracted = extractBlocks(file, raw);
+    outputSections.push(...extracted);
+  }
+
+  if (validationErrors.length > 0) {
+    console.error('❌ Linting Errors:');
+    for (const err of validationErrors) {
+      console.error(`  - ${err}`);
+    }
+    return;
+  }
+
+  const finalSchema = `// THIS FILE IS AUTO-GENERATED. DO NOT EDIT MANUALLY.
+
+${GENERATOR_BLOCK.trim()}
+
+${DATASOURCE_BLOCK.trim()}
+
+${outputSections.join('\n\n')}
+`;
+
+  if (DRY_RUN) {
+    console.log(finalSchema);
+  } else {
+    fs.writeFileSync(OUTPUT_PATH, finalSchema);
+    console.log('✅ schema.prisma generated.');
   }
 }
 
-if (process.argv[1].endsWith("prisma-build-schema.ts")) {
-  if (!process.env.DATABASE_URL) {
-    console.error("❌ DATABASE_URL is not set. Please define it in your environment.");
-    process.exit(1);
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    console.warn("⚠️ Running Prisma build script in development mode.");
-  }
-
-  console.log("🛠 Building Prisma schema...");
-  buildSchema()
-    .then(() => console.log("✅ schema.prisma build completed!"))
-    .catch((err) => {
-      console.error("❌ Prisma schema build failed:", err);
-      process.exit(1);
-    });
+if (WATCH) {
+  console.log('👀 Watching for changes...');
+  chokidar.watch(ROOT_DIR, { ignoreInitial: false }).on('all', () => {
+    try {
+      generateSchema();
+    } catch (err) {
+      console.error('❌ Error generating schema:', err);
+    }
+  });
+} else {
+  generateSchema();
 }

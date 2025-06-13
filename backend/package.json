@@ -23,6 +23,7 @@
     "lint": "eslint auth-kit-core --ext .ts,.js",
     "format": "prettier --write . && pnpm prisma:format",
     "watch": "tsx scripts/watch.ts",
+    "prisma:watch": "pnpm prisma:build-schema --watch",
 
     "env:validate": "tsx auth-kit-core/common/validators/env.config.ts",
     "generate:frontend-env": "tsx scripts/generate-frontend-env.ts",
