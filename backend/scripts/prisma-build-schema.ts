@@ -2,6 +2,7 @@ import 'dotenv/config';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { logger } from '@utils/logger';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,14 +57,14 @@ export async function buildSchema(dryRun = false) {
     const enumsDir = path.resolve(schemasDir, 'enums');
     const outputFile = path.resolve(__dirname, '../prisma/schema.prisma');
 
-    console.log(`🔍 Scanning schemas in: ${schemasDir}`);
-    console.log(`🔍 Scanning enums in: ${enumsDir}`);
+    logger.info(`🔍 Scanning schemas in: ${schemasDir}`);
+    logger.info(`🔍 Scanning enums in: ${enumsDir}`);
 
     const enumFiles = await getPrismaFilesRecursive(enumsDir, '.enum.prisma');
     const schemaFiles = await getPrismaFilesRecursive(schemasDir, '.prisma');
 
     if (enumFiles.length === 0 && schemaFiles.length === 0) {
-      console.warn('⚠️ No schema or enum files found.');
+      logger.warn('⚠️ No schema or enum files found.');
       return;
     }
 
@@ -90,14 +91,14 @@ export async function buildSchema(dryRun = false) {
     const finalSchema = [schemaHeader, ...parts].join('\n\n');
 
     if (dryRun) {
-      console.log('💡 [Dry Run] Final schema output:\n');
-      console.log(finalSchema);
+      logger.info('💡 [Dry Run] Final schema output:\n');
+      logger.info(finalSchema);
     } else {
       await fs.writeFile(outputFile, finalSchema);
-      console.log(`✅ schema.prisma generated at ${outputFile}`);
+      logger.info(`✅ schema.prisma generated at ${outputFile}`);
     }
   } catch (err) {
-    console.error('❌ Error building schema:', err instanceof Error ? err.stack : err);
+    logger.error('❌ Error building schema:', err instanceof Error ? err.stack : err);
     throw err;
   }
 }
@@ -105,24 +106,24 @@ export async function buildSchema(dryRun = false) {
 // --- CLI Entrypoint ---
 if (process.argv[1].endsWith('prisma-build-schema.ts') || process.argv[1].endsWith('prisma-build-schema.js')) {
   if (!process.env.DATABASE_URL) {
-    console.error('❌ DATABASE_URL is not set.');
+    logger.error('❌ DATABASE_URL is not set.');
     process.exit(1);
   }
 
   const dryRun = process.argv.includes('--dry');
 
   if (process.env.NODE_ENV !== 'production') {
-    console.warn('⚠️ Running Prisma schema builder in development mode.');
+    logger.warn('⚠️ Running Prisma schema builder in development mode.');
   }
 
-  console.log(`🛠 Starting Prisma schema build ${dryRun ? '(Dry Run Mode)' : ''}...`);
+  logger.info(`🛠 Starting Prisma schema build ${dryRun ? '(Dry Run Mode)' : ''}...`);
 
   buildSchema(dryRun)
     .then(() => {
-      if (!dryRun) console.log('✅ schema.prisma build completed!');
+      if (!dryRun) logger.info('✅ schema.prisma build completed!');
     })
     .catch((err) => {
-      console.error('❌ Failed to build Prisma schema:', err);
+      logger.error('❌ Failed to build Prisma schema:', err);
       process.exit(1);
     });
 }

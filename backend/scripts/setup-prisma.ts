@@ -1,24 +1,25 @@
 import { execSync } from 'node:child_process';
 import { buildSchema } from './prisma-build-schema.js';
+import { logger } from '@utils/logger'
 
 async function runSetup() {
   try {
-    console.log('📦 Building Prisma schema...');
+    logger.info('📦 Building Prisma schema...');
     await buildSchema();
 
-    console.log('📜 Generating Prisma enums...');
+    logger.info('📜 Generating Prisma enums...');
     execSync('tsx scripts/generate-prisma-enums.ts', { stdio: 'inherit' });
 
-    console.log('🧹 Resetting database...');
+    logger.info('🧹 Resetting database...');
     execSync('pnpm run prisma:reset', { stdio: 'inherit' });
 
-    console.log('⚙️ Generating Prisma client...');
+    logger.info('⚙️ Generating Prisma client...');
     execSync('pnpm run prisma:generate', { stdio: 'inherit' });
 
-    console.log('🌱 Seeding database...');
+    logger.info('🌱 Seeding database...');
     execSync('pnpm run prisma:seed', { stdio: 'inherit' });
 
-    console.log('✅ Prisma setup complete!');
+    logger.info('✅ Prisma setup complete!');
   } catch (err) {
     console.error('❌ Failed to setup Prisma:', err instanceof Error ? err.message : err);
     process.exit(1);

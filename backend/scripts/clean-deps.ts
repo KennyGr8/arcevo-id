@@ -1,9 +1,10 @@
 import { execSync, spawnSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { logger } from '@utils/logger';
 
 const FIX_MODE = process.argv.includes("--fix");
-const log = (...args: any[]) => console.log("🧹", ...args);
+const log = (...args: any[]) => logger.warn("🧹", ...args);
 
 function safeExec(command: string, retries = 1) {
   try {
@@ -40,7 +41,7 @@ function runDepcheck() {
       log("✅ No unused packages found.");
     }
   } catch (err) {
-    console.error("❌ depcheck failed:", err.message);
+    logger.error("❌ depcheck failed:", err.message);
   }
 }
 
@@ -49,12 +50,12 @@ function runTSPrune() {
   try {
     const result = safeExec("npx ts-prune");
     if (result.trim()) {
-      console.log(result);
+      logger.success(result);
     } else {
       log("✅ No unused exports found.");
     }
   } catch (err) {
-    console.error("❌ ts-prune failed:", err.message);
+    logger.error("❌ ts-prune failed:", err.message);
   }
 }
 

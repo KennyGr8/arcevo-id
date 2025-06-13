@@ -1,169 +1,152 @@
-import { fileURLToPath } from 'url';
-import path from 'path';
-import fs from 'fs-extra';
-import chokidar from 'chokidar';
-import prettier from 'prettier';
-import { program } from 'commander';
-import { PrismaParser } from '@mrleebo/prisma-ast';
-import { logger } from '@utils/logger';
+#!/usr/bin/env tsx
+
+import "dotenv/config";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import prettier from "prettier";
+import chalk from "chalk";
+import { PrismaParser, PrismaAstDocument } from "@mrleebo/prisma-ast"; // ✅ Corrected
+import { z } from "zod";
+import { logger } from "@utils/logger";
+
+logger.info(chalk.cyan("🔄 Generating database adapters and schemas..."));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PRISMA_SCHEMA_PATH = path.resolve(__dirname, '../prisma/schema.prisma');
-const OUTPUT_INTERFACE_DIR = path.resolve(__dirname, '../auth-kit-core/src/core/interfaces/database');
-const OUTPUT_ZOD_DIR = path.resolve(__dirname, '../auth-kit-core/src/core/interfaces/database/zod');
-const CIA_FILE_PATH = path.resolve(__dirname, '../auth-kit-core/src/core/interfaces/database/cia.ts');
-
-program
-  .option('--overwrite', 'Overwrite existing files', false)
-  .option('--only <model>', 'Generate only for a specific model')
-  .option('--watch', 'Watch schema for changes')
-  .parse(process.argv);
-
-const options = program.opts();
-
-const FIELD_TYPE_MAP: Record<string, string> = {
-  String: 'string',
-  Int: 'number',
-  Float: 'number',
-  Boolean: 'boolean',
-  DateTime: 'Date',
-  Json: 'any',
-};
-
-const ZOD_TYPE_MAP: Record<string, string> = {
-  String: 'z.string()',
-  Int: 'z.number()',
-  Float: 'z.number()',
-  Boolean: 'z.boolean()',
-  DateTime: 'z.date()',
-  Json: 'z.any()',
-};
-
-function toPascalCase(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+// Load Prisma schema
+const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
+if (!fs.existsSync(schemaPath)) {
+  logger.warn(chalk.red(`❌ schema.prisma not found at ${schemaPath}`));
+  process.exit(1);
 }
 
-function mapFieldType(fieldType: string, isArray: boolean): string {
-  const base = FIELD_TYPE_MAP[fieldType] || fieldType;
-  return isArray ? `${base}[]` : base;
-}
+const schema = fs.readFileSync(schemaPath, "utf-8");
+logger.info(chalk.green("✅ Loaded schema prisma"));
 
-function mapZodType(fieldType: string, isArray: boolean): string {
-  const base = ZOD_TYPE_MAP[fieldType] || 'z.any()';
-  return isArray ? `z.array(${base})` : base;
-}
+// Parse schema safely using PrismaParser
+const ast: PrismaAstDocument = PrismaParser.parse(schema);
+logger.info(chalk.green("✅ Prisma schema parsed with PrismaParser, Parsed Prisma schema AST"));
 
-function generateInterface(model: any): string {
-  const name = toPascalCase(model.name);
-
-  const fields = model.properties
-    .filter((p: any) => p.type === 'field' && typeof p.fieldType === 'string')
-    .map((field: any) => `  ${field.name}${field.optional ? '?' : ''}: ${mapFieldType(field.fieldType, field.array)};`)
-    .join('\n');
-
-  return `export interface ${name} {
-${fields}
-}
-
-export interface ${name}Adapter {
-  findById(id: string): Promise<${name} | null>;
-  create(data: Partial<${name}>): Promise<${name}>;
-  update(id: string, data: Partial<${name}>): Promise<${name}>;
-  delete(id: string): Promise<void>;
-}
-`;
-}
-
-function generateZodSchema(model: any): string {
-  const fields = model.properties
-    .filter((p: any) => p.type === 'field' && typeof p.fieldType === 'string')
-    .map((field: any) => {
-      const zodType = mapZodType(field.fieldType, field.array);
-      const optional = field.optional ? '.optional()' : '';
-      return `  ${field.name}: ${zodType}${optional},`;
-    })
-    .join('\n');
-
-  return `import { z } from 'zod';
-
-export const ${model.name}Schema = z.object({
-${fields}
+// Output directories
+const baseOutputDir = path.join(__dirname, "../auth-kit-core/src/core/interfaces/database");
+const typesDir = path.join(baseOutputDir, "types");
+const zodDir = path.join(baseOutputDir, "zod");
+[typesDir, zodDir].forEach((dir) => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
-`;
+
+// Scalar types recognized by Prisma
+const scalarTypes = [
+  "String", "Int", "Boolean", "DateTime", "Float", "Json",
+  "BigInt", "Bytes", "Decimal"
+];
+
+// Extract enums
+const enums = ast.list.filter((node) => node.type === "enum");
+const enumMap: Record<string, string[]> = {};
+for (const en of enums) {
+  enumMap[en.name] = en.enumerators.map((e) => e.name);
 }
 
-async function format(content: string): Promise<string> {
-  try {
-    return await prettier.format(content, { parser: 'typescript' });
-  } catch (err) {
-    logger.warn('⚠️ Failed to format with Prettier. Returning raw content.');
-    return content;
-  }
+// Utility: Map Prisma type to Zod schema
+function prismaToZod(type: string, isArray: boolean, isOptional: boolean, defaultVal?: any): string {
+  const baseType = enumMap[type]
+    ? `z.enum([${enumMap[type].map((v) => `'${v}'`).join(", ")}])`
+    : (scalarTypes.includes(type)
+        ? ({
+            String: "z.string()",
+            Int: "z.number().int()",
+            Boolean: "z.boolean()",
+            DateTime: "z.coerce.date()",
+            Float: "z.number()",
+            Json: "z.any()",
+            BigInt: "z.bigint()",
+            Bytes: "z.instanceof(Buffer)",
+            Decimal: "z.number()",
+          }[type])
+        : `z.custom<${type}>()`);
+
+  let zod = isArray ? `z.array(${baseType})` : baseType;
+  if (isOptional || defaultVal !== undefined) zod += ".optional()";
+  return zod;
 }
 
-async function parsePrismaModels(): Promise<any[]> {
-  const raw = await fs.readFile(PRISMA_SCHEMA_PATH, 'utf-8');
-  const ast = PrismaParser(raw);
-  return ast.list.filter((node: any) => node.type === 'model');
-}
+// Extract models
+const models = ast.list.filter((node) => node.type === "model");
+const exports: string[] = [];
 
-async function generateAllInterfaces(): Promise<void> {
-  try {
-    const models = await parsePrismaModels();
-    const onlyModel = options.only?.toLowerCase() || null;
+for (const model of models) {
+  const modelName = model.name;
+  const fields = model.properties.filter((p) => p.type === "field");
 
-    await fs.ensureDir(OUTPUT_INTERFACE_DIR);
-    await fs.ensureDir(OUTPUT_ZOD_DIR);
+  const interfaceLines = [`export interface ${modelName}Adapter {`];
+  const zodLines = [`export const ${modelName}Schema = z.object({`];
 
-    const ciaExports: string[] = [];
+  for (const field of fields) {
+    const {
+      name: fieldName,
+      fieldType,
+      array: isArray,
+      optional: isOptional,
+      attributes,
+      documentation,
+      comment,
+    } = field;
 
-    for (const model of models) {
-      const modelName = model.name;
-      if (onlyModel && modelName.toLowerCase() !== onlyModel) continue;
+    const isRelation = attributes?.some((a) => a.name === "relation");
+    const isComposite = !scalarTypes.includes(fieldType) && !enumMap[fieldType];
 
-      const interfaceFilename = `${modelName.toLowerCase()}.adapter.interface.ts`;
-      const zodFilename = `${modelName.toLowerCase()}.schema.ts`;
-
-      const interfacePath = path.join(OUTPUT_INTERFACE_DIR, interfaceFilename);
-      const zodPath = path.join(OUTPUT_ZOD_DIR, zodFilename);
-
-      if (!options.overwrite && await fs.pathExists(interfacePath)) {
-        logger.warn(`⏭ Skipped ${interfaceFilename} (exists, no --overwrite)`);
-        continue;
-      }
-
-      const interfaceContent = await format(generateInterface(model));
-      const zodContent = await format(generateZodSchema(model));
-
-      await fs.writeFile(interfacePath, interfaceContent);
-      await fs.writeFile(zodPath, zodContent);
-
-      ciaExports.push(`export * from './${path.basename(interfaceFilename, '.ts')}';`);
-      logger.info(`✅ Generated: ${interfaceFilename}, ${zodFilename}`);
+    if (isRelation) continue;
+    if (isComposite) {
+      logger.info(chalk.yellow(`⚠️ Skipping composite field "${fieldName}" in ${modelName}`));
+      continue;
     }
 
-    const exportBlock = await format(`// AUTO-GENERATED. DO NOT EDIT.\n${ciaExports.join('\n')}\n`);
-    await fs.writeFile(CIA_FILE_PATH, exportBlock);
-    logger.info(`📦 Updated export barrel: ${path.basename(CIA_FILE_PATH)}`);
-  } catch (err) {
-    logger.error('🚨 Interface generation failed:', err);
-    process.exit(1);
+    const docBlock = [
+      documentation ?? comment ? `* ${(documentation ?? comment)?.trim()}` : null,
+      attributes?.find((a) => a.name === "map")?.args?.[0]?.value
+        ? `* @mapped("${attributes.find((a) => a.name === "map")?.args?.[0]?.value}")`
+        : null,
+      attributes?.find((a) => a.name === "default")?.args?.[0]?.value === "uuid()"
+        ? `* @default(uuid())`
+        : null,
+    ]
+      .filter(Boolean)
+      .map((line) => `  /** ${line} */`)
+      .join("\n");
+
+    const interfaceLine = `${docBlock ? docBlock + "\n" : ""}  ${fieldName}${isOptional ? "?" : ""}: ${isArray ? `${fieldType}[]` : fieldType};`;
+    const zodLine = `  ${fieldName}: ${prismaToZod(fieldType, isArray, isOptional)},`;
+
+    interfaceLines.push(interfaceLine);
+    zodLines.push(zodLine);
   }
+
+  interfaceLines.push("}");
+  zodLines.push("});");
+
+  const formattedInterface = prettier.format(interfaceLines.join("\n"), { parser: "typescript" });
+  const formattedZod = prettier.format(
+    `import { z } from "zod";\n\n${zodLines.join("\n")}`,
+    { parser: "typescript" }
+  );
+
+  const typePath = path.join(typesDir, `${modelName.toLowerCase()}.adapter.interface.ts`);
+  const zodPath = path.join(zodDir, `${modelName.toLowerCase()}.schema.ts`);
+
+  fs.writeFileSync(typePath, formattedInterface);
+  fs.writeFileSync(zodPath, formattedZod);
+
+  logger.info(chalk.green(`✅ Generated: ${modelName}Adapter + Schema`));
+  exports.push(
+    `export * from './types/${modelName.toLowerCase()}.adapter.interface';`,
+    `export * from './zod/${modelName.toLowerCase()}.schema';`
+  );
 }
 
-function startWatcher(): void {
-  chokidar.watch(PRISMA_SCHEMA_PATH).on('change', () => {
-    logger.info('🔁 Detected schema change. Regenerating...');
-    generateAllInterfaces().catch(logger.error);
-  });
-}
-
-// Run
-generateAllInterfaces().then(() => {
-  if (options.watch) {
-    logger.info('👀 Watch mode enabled. Listening for schema changes...');
-    startWatcher();
-  }
-});
+// Create CIA barrel file
+const ciaPath = path.join(baseOutputDir, "cia.ts");
+fs.writeFileSync(ciaPath, exports.join("\n"));
+logger.info(chalk.green("✅ Created cia.ts barrel file"));

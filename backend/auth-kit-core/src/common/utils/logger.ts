@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston';
 import 'winston-daily-rotate-file';
-import { config } from '../../database/config/app.config';
+import { config } from '@database/config/app.config';
 
 const logFormat = format.combine(
   format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
