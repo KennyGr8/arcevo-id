@@ -1,15 +1,13 @@
 import 'dotenv/config';
-import fs from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-console.log("👀 Script started running...");
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { logger } from '@utils/logger';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const schemaHeader = `
-// THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
+const schemaHeader = `// THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
 // Modify individual schema parts in the prisma/schemas directory.
 
 generator client {
@@ -25,71 +23,107 @@ datasource db {
 generator seed {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
-}
-`.trim();
+}`.trim();
 
-async function getPrismaFilesFromDir(dir: string, extension = ".prisma") {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(extension))
-    .map((entry) => path.join(dir, entry.name));
+/**
+ * Recursively gets all files ending with the given extension
+ */
+async function getPrismaFilesRecursive(dir: string, extension: string): Promise<string[]> {
+  const result: string[] = [];
+
+  async function traverse(currentDir: string) {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await traverse(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith(extension)) {
+        result.push(fullPath);
+      }
+    }
+  }
+
+  await traverse(dir);
+  return result.sort(); // consistent order
 }
 
-export async function buildSchema() {
+/**
+ * Build Prisma schema by combining schema and enum files
+ */
+export async function buildSchema(dryRun = false) {
   try {
-    const schemasDir = path.resolve(__dirname, "../prisma/schemas");
-    const enumsDir = path.resolve(schemasDir, "enums");
-    const outputFile = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemasDir = path.resolve(__dirname, '../prisma/schemas');
+    const enumsDir = path.resolve(schemasDir, 'enums');
+    const outputFile = path.resolve(__dirname, '../prisma/schema.prisma');
 
-    console.log(`🔍 Reading schema parts from: ${schemasDir}`);
-    console.log(`🔍 Reading enum parts from: ${enumsDir}`);
+    logger.info(`🔍 Scanning schemas in: ${schemasDir}`);
+    logger.info(`🔍 Scanning enums in: ${enumsDir}`);
 
-    const schemaFiles = await getPrismaFilesFromDir(schemasDir);
-    const enumFiles = await getPrismaFilesFromDir(enumsDir, ".enum.prisma");
+    const enumFiles = await getPrismaFilesRecursive(enumsDir, '.enum.prisma');
+    const schemaFiles = await getPrismaFilesRecursive(schemasDir, '.prisma');
 
-    if (schemaFiles.length === 0 && enumFiles.length === 0) {
-      console.warn("⚠️ No schema or enum parts found.");
+    if (enumFiles.length === 0 && schemaFiles.length === 0) {
+      logger.warn('⚠️ No schema or enum files found.');
       return;
     }
 
-    const allFiles = [...enumFiles, ...schemaFiles]; // enums first, then models
+    const allFiles = [...enumFiles, ...schemaFiles];
 
-    const parts = await Promise.all(
-      allFiles.map(async (filePath) => {
-        console.log(`📄 Processing: ${filePath}`);
-        const content = await fs.readFile(filePath, "utf-8");
-        return content
-          .replace(/generator\s+\w+\s+\{[^}]*\}/g, "")
-          .replace(/datasource\s+\w+\s+\{[^}]*\}/g, "")
-          .trim();
-      })
-    );
+    const seen = new Set<string>();
+    const parts: string[] = [];
 
-    const finalSchema = [schemaHeader, ...parts].join("\n\n");
-    await fs.writeFile(outputFile, finalSchema);
+    for (const filePath of allFiles) {
+      const content = await fs.readFile(filePath, 'utf-8');
 
-    console.log(`✅ schema.prisma generated successfully at ${outputFile}`);
+      const relativePath = path.relative(path.resolve(__dirname, '../'), filePath);
+      const sanitizedContent = content
+        .replace(/generator\s+\w+\s+\{[^}]*\}/g, '')
+        .replace(/datasource\s+\w+\s+\{[^}]*\}/g, '')
+        .trim();
+
+      if (!sanitizedContent || seen.has(sanitizedContent)) continue;
+
+      seen.add(sanitizedContent);
+      parts.push(`// --- File: ${relativePath} ---\n\n${sanitizedContent}`);
+    }
+
+    const finalSchema = [schemaHeader, ...parts].join('\n\n');
+
+    if (dryRun) {
+      logger.info('💡 [Dry Run] Final schema output:\n');
+      logger.info(finalSchema);
+    } else {
+      await fs.writeFile(outputFile, finalSchema);
+      logger.info(`✅ schema.prisma generated at ${outputFile}`);
+    }
   } catch (err) {
-    console.error("❌ Error inside buildSchema():", err instanceof Error ? err.stack : err);
+    logger.error('❌ Error building schema:', err instanceof Error ? err.stack : err);
     throw err;
   }
 }
 
-if (process.argv[1].endsWith("prisma-build-schema.ts")) {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn("⚠️  This script is intended for production builds only. Running in development mode.");
-  }
-
+// --- CLI Entrypoint ---
+if (process.argv[1].endsWith('prisma-build-schema.ts') || process.argv[1].endsWith('prisma-build-schema.js')) {
   if (!process.env.DATABASE_URL) {
-    console.error("❌ DATABASE_URL environment variable is not set. Please set it before running this script.");
+    logger.error('❌ DATABASE_URL is not set.');
     process.exit(1);
   }
 
-  console.log("🛠 Building Prisma schema...");
-  buildSchema()
-    .then(() => console.log("✅ schema.prisma generated successfully!"))
+  const dryRun = process.argv.includes('--dry');
+
+  if (process.env.NODE_ENV !== 'production') {
+    logger.warn('⚠️ Running Prisma schema builder in development mode.');
+  }
+
+  logger.info(`🛠 Starting Prisma schema build ${dryRun ? '(Dry Run Mode)' : ''}...`);
+
+  buildSchema(dryRun)
+    .then(() => {
+      if (!dryRun) logger.info('✅ schema.prisma build completed!');
+    })
     .catch((err) => {
-      console.error("❌ Failed to build schema:", err instanceof Error ? err.stack : err);
+      logger.error('❌ Failed to build Prisma schema:', err);
       process.exit(1);
     });
 }

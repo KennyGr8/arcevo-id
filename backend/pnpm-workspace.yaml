@@ -1,7 +1,0 @@
-packages:
-  - "auth-kit-core"
-  - "backend/*"
-  - "scripts/*"
-  - "prisma/*"
-  - "adapters/*"
-  - "cli"

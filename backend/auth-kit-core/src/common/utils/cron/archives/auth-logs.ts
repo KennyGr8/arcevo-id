@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { prisma } from "@database";
-import { logger } from "@utils/logger";
+import { logger } from "@utils";
 
 const LOG_RETENTION_DAYS = 90; // default 90 days
 

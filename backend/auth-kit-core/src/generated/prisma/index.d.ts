@@ -152,6 +152,15 @@ export const BillingEventType: {
 export type BillingEventType = (typeof BillingEventType)[keyof typeof BillingEventType]
 
 
+export const BillingProvider: {
+  STRIPE: 'STRIPE',
+  PAYSTACK: 'PAYSTACK',
+  LEMONSQUEEZY: 'LEMONSQUEEZY'
+};
+
+export type BillingProvider = (typeof BillingProvider)[keyof typeof BillingProvider]
+
+
 export const OAuthProvider: {
   GITHUB: 'GITHUB',
   GOOGLE: 'GOOGLE',
@@ -263,6 +272,10 @@ export const AuthEvent: typeof $Enums.AuthEvent
 export type BillingEventType = $Enums.BillingEventType
 
 export const BillingEventType: typeof $Enums.BillingEventType
+
+export type BillingProvider = $Enums.BillingProvider
+
+export const BillingProvider: typeof $Enums.BillingProvider
 
 export type OAuthProvider = $Enums.OAuthProvider
 

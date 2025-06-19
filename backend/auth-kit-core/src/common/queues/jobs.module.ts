@@ -1,6 +1,6 @@
 import { cleanupWorker } from "./processors/cleanup.processor";
 import { scheduleRecurringJobs } from "./schedulers";
-import { logger } from "@utils/logger";
+import { logger } from "@utils";
 
 export async function initJobModule() {
   // Register workers and their event listeners

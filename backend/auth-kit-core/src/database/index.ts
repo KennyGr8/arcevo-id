@@ -1,7 +1,3 @@
-import { prisma } from "./prisma";
+// auth-kit-core/src/database/index.ts
 
-export const getDbClient = () => prisma;
-
-export async function shutdownDb() {
-  await prisma.$disconnect();
-}
+export * from "./prisma";

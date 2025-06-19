@@ -1,4 +1,4 @@
-import { HTTPSTATUS, HttpStatusCode } from "@config/http.config";
+import { HTTPSTATUS, HttpStatusCode } from "@database/config/http.config";
 import { ErrorCode } from "@enums/error-code.enum";
 
 export class AppError extends Error {

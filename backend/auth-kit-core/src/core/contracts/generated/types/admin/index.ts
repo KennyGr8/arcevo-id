@@ -1,0 +1,1 @@
+export * from './AdminAuditLog.adapter.interface';

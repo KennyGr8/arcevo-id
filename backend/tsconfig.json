@@ -1,6 +1,10 @@
 {
   "extends": "../tsconfig.build.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
     "composite": true
   },
   "include": ["auth-kit-core", "scripts", "prisma"]

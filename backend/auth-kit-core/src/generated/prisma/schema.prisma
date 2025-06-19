@@ -16,12 +16,16 @@ generator seed {
   output   = "../node_modules/.prisma/client"
 }
 
+// --- File: prisma\schemas\enums\activity-type.enum.prisma ---
+
 enum ActivityType {
   LOGIN
   LOGOUT
   MFA_ENABLED
   PASSWORD_RESET
 }
+
+// --- File: prisma\schemas\enums\admin-action.enum.prisma ---
 
 enum AdminAction {
   USER_BAN
@@ -33,6 +37,8 @@ enum AdminAction {
   SUBSCRIPTION_UPDATED
 }
 
+// --- File: prisma\schemas\enums\auth-event.enum.prisma ---
+
 enum AuthEvent {
   LOGIN
   LOGOUT
@@ -42,6 +48,8 @@ enum AuthEvent {
   PASSWORD_CHANGED
   TOKEN_EXPIRED
 }
+
+// --- File: prisma\schemas\enums\billing-event-type.enum.prisma ---
 
 enum BillingEventType {
   SUBSCRIPTION_CREATED
@@ -57,6 +65,16 @@ enum BillingEventType {
   RENEWAL
   PROVIDER_SYNC
 }
+
+// --- File: prisma\schemas\enums\billing-provider.enum.prisma ---
+
+enum BillingProvider {
+  STRIPE
+  PAYSTACK
+  LEMONSQUEEZY
+}
+
+// --- File: prisma\schemas\enums\oauth-provider.enum.prisma ---
 
 enum OAuthProvider {
   GITHUB
@@ -74,6 +92,8 @@ enum Web3OAuthProvider {
   BITCOIN
 }
 
+// --- File: prisma\schemas\enums\organization-role.enum.prisma ---
+
 enum OrganizationRole {
   OWNER
   ADMIN
@@ -81,12 +101,16 @@ enum OrganizationRole {
   GUEST
 }
 
+// --- File: prisma\schemas\enums\role.enum.prisma ---
+
 enum Role {
   USER
   PREMIUM
   PRO
   ADMIN
 }
+
+// --- File: prisma\schemas\enums\subscription-plan.enum.prisma ---
 
 enum SubscriptionPlan {
   FREE
@@ -96,11 +120,15 @@ enum SubscriptionPlan {
   EDUCATOR
 }
 
+// --- File: prisma\schemas\enums\subscription-provider.enum.prisma ---
+
 enum SubscriptionProvider {
   STRIPE
   PAYSTACK
   LEMONSQUEEZY
 }
+
+// --- File: prisma\schemas\enums\subscription-status.enum.prisma ---
 
 enum SubscriptionStatus {
   ACTIVE
@@ -110,6 +138,8 @@ enum SubscriptionStatus {
   RENEWED
 }
 
+// --- File: prisma\schemas\enums\token-type.enum.prisma ---
+
 enum TokenType {
   VERIFY_EMAIL
   RESET_PASSWORD
@@ -117,11 +147,15 @@ enum TokenType {
   TOTP
 }
 
+// --- File: prisma\schemas\enums\user-status.enum.prisma ---
+
 enum UserStatus {
   active
   suspended
   banned
 }
+
+// --- File: prisma\schemas\activity-log.prisma ---
 
 model ActivityLog {
   id        String       @id @default(uuid())
@@ -138,6 +172,8 @@ model ActivityLog {
   @@index([createdAt])
 }
 
+// --- File: prisma\schemas\admin-audit-log.prisma ---
+
 model AdminAuditLog {
   id        String      @id @default(uuid())
   action    AdminAction
@@ -151,6 +187,8 @@ model AdminAuditLog {
   @@index([action])
   @@index([createdAt])
 }
+
+// --- File: prisma\schemas\auth-log.prisma ---
 
 model AuthLog {
   id              String    @id @default(uuid())
@@ -169,6 +207,8 @@ model AuthLog {
   @@index([event])
   @@index([createdAt])
 }
+
+// --- File: prisma\schemas\billing-event.prisma ---
 
 model BillingEvent {
   id     String @id @default(uuid())
@@ -191,6 +231,8 @@ model BillingEvent {
   @@index([createdAt])
 }
 
+// --- File: prisma\schemas\email-token.prisma ---
+
 model EmailToken {
   id        String    @id @default(uuid())
   email     String
@@ -205,6 +247,8 @@ model EmailToken {
   @@index([type])
   @@index([expiresAt])
 }
+
+// --- File: prisma\schemas\mfa.prisma ---
 
 model MFA {
   id          String           @id @default(uuid())
@@ -230,6 +274,8 @@ model MFA_BackupCode {
   @@index([usedAt])
 }
 
+// --- File: prisma\schemas\oauth-account.prisma ---
+
 model OAuthAccount {
   id             String        @id @default(uuid())
   userId         String
@@ -246,6 +292,8 @@ model OAuthAccount {
   @@index([provider])
 }
 
+// --- File: prisma\schemas\organization-domain.prisma ---
+
 model OrganizationDomain {
   id             String       @id @default(uuid())
   organizationId String
@@ -253,6 +301,8 @@ model OrganizationDomain {
   domain         String       @unique
   verified       Boolean      @default(false)
 }
+
+// --- File: prisma\schemas\organization-invite.prisma ---
 
 model OrganizationInvite {
   id             String       @id @default(uuid())
@@ -273,6 +323,8 @@ model OrganizationInvite {
   @@index([email])
 }
 
+// --- File: prisma\schemas\organization-membership.prisma ---
+
 model OrganizationMembership {
   id     String @id @default(uuid())
   userId String
@@ -290,6 +342,8 @@ model OrganizationMembership {
   @@unique([userId, organizationId])
 }
 
+// --- File: prisma\schemas\organization-sso-provider.prisma ---
+
 model OrganizationSSOProvider {
   id             String       @id @default(uuid())
   organizationId String
@@ -300,6 +354,8 @@ model OrganizationSSOProvider {
 
   @@index([organizationId])
 }
+
+// --- File: prisma\schemas\organization.prisma ---
 
 model Organization {
   id        String   @id @default(uuid())
@@ -313,6 +369,8 @@ model Organization {
   invites      OrganizationInvite[]
   ssoProviders OrganizationSSOProvider[]
 }
+
+// --- File: prisma\schemas\session.prisma ---
 
 model Session {
   id              String    @id @default(uuid())
@@ -340,6 +398,8 @@ model Session {
   @@index([expiresAt])
   @@index([valid])
 }
+
+// --- File: prisma\schemas\subscription.prisma ---
 
 model Subscription {
   id     String @id @default(uuid())
@@ -371,6 +431,8 @@ model Subscription {
   @@index([provider])
   @@index([currentPeriodEnd])
 }
+
+// --- File: prisma\schemas\user.prisma ---
 
 model User {
   id            String    @id @default(uuid())

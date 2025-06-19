@@ -1,11 +1,11 @@
 {
-  "name": "nexaauth-backend",
+  "name": "arcevo-id-backend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "main": "auth-kit-core/dist/index.js",
-  "description": "Backend monorepo root for NexaAuth",
-  "author": "NexaDev",
+  "description": "Backend monorepo root for ArcevoId",
+  "author": "ArcevoDev",
   "license": "MIT",
   "workspaces": [
     "auth-kit-core"
@@ -19,13 +19,18 @@
     "dev": "tsx -r tsconfig-paths/register src/index.ts",
     "build": "tsc -p auth-kit-core && cpy auth-kit-core/package.json auth-kit-core/dist --rename=package.json",
     "start": "node auth-kit-core/dist/index.js",
-    "test": "jest --passWithNoTests",
-    "lint": "eslint auth-kit-core --ext .ts,.js",
+    "test": "vitest run",
+    "tsc": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write . && pnpm prisma:format",
+    "watch": "tsx scripts/watch.ts",
+    "prisma:watch": "pnpm prisma:build-schema --watch",
+
     "env:validate": "tsx auth-kit-core/common/validators/env.config.ts",
-    "generate:frontend-env": "tsx scripts/generate-frontend-env.ts",
-    "generate:modules": "tsx scripts/generate-modules.ts",
+    "utils:index": "tsx scripts/generate-utils-index.ts",
+    "generate:db-contracts": "pnpm prisma:build-schema && tsx scripts/generate-contracts.ts",
     "generate:prisma-enums": "pnpm prisma:build-schema && tsx scripts/generate-prisma-enums.ts",
+    "prisma:enums:auto": "pnpm generate:prisma-enums && git add . && git commit -m \"chore: regenerate prisma enums\" || echo \"No changes to commit\"",
     "patch:configs": "tsx scripts/patch-configs.ts",
     "prisma:build-schema": "tsx scripts/prisma-build-schema.ts",
     "prisma:format": "pnpm prisma:build-schema && prisma format --schema=prisma/schema.prisma",
@@ -33,7 +38,7 @@
     "prisma:generate": "pnpm prisma:build-schema && prisma generate --schema=prisma/schema.prisma",
     "prisma:reset": "pnpm prisma:build-schema && prisma migrate reset --force --schema=prisma/schema.prisma",
     "prisma:seed": "pnpm prisma:build-schema && prisma db seed",
-    "db:setup": "tsx scripts/setup-prisma.ts",
+    "prismadb:setup": "tsx scripts/setup-prisma.ts",
     "core:build": "pnpm build --workspace=auth-kit-core",
     "core:watch": "tsc -p tsconfig.build.json --watch",
     "postinstall": "pnpm --filter auth-kit-core build",
@@ -74,10 +79,10 @@
     "ua-parser-js": "^2.0.3",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0",
-    "zod": "^3.24.3"
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@prisma/internals": "^6.9.0",
     "@tsconfig/node18": "^18.2.4",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.8",
@@ -94,6 +99,9 @@
     "@types/speakeasy": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
+    "@vitest/coverage-v8": "^3.2.3",
+    "@vitest/ui": "^3.2.3",
+    "chalk": "^5.4.1",
     "chokidar-cli": "^3.0.0",
     "cpy-cli": "^5.0.0",
     "eslint": "^9.27.0",
@@ -110,7 +118,9 @@
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.3",
+    "zod": "^3.25.64"
   }
 }

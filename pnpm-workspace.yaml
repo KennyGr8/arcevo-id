@@ -1,6 +1,8 @@
 packages:
   - 'backend'
   - 'backend/auth-kit-core'
+  - 'backend/cli'
+  - 'backend/scripts'
   - 'frontend'
   - 'frontend/auth-kit-ui/*'
   - 'scripts'

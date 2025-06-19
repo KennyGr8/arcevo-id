@@ -1,5 +1,5 @@
-import { HTTPSTATUS, HttpStatusCode } from "../../database/config/http.config";
-import { ErrorCode } from "../constants/enums/error-code.enum";
+import { HTTPSTATUS, HttpStatusCode } from "@database/config/http.config";
+import { ErrorCode } from "@enums/error-code.enum";
 import { AppError } from "./AppError";
 
 export class NotFoundException extends AppError {

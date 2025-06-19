@@ -1,20 +1,29 @@
-// scripts/setup-prisma.ts
 import { execSync } from 'node:child_process';
+import { buildSchema } from './prisma-build-schema.js';
+import { logger } from '@utils/logger'
 
-try {
-  console.log('🧹 Resetting database...');
-  execSync('npm run prisma:reset', { stdio: 'inherit' });
+async function runSetup() {
+  try {
+    logger.info('📦 Building Prisma schema...');
+    await buildSchema();
 
-  console.log('⚙️ Generating client...');
-  execSync('npm run prisma:generate', { stdio: 'inherit' });
+    logger.info('📜 Generating Prisma enums...');
+    execSync('tsx scripts/generate-prisma-enums.ts', { stdio: 'inherit' });
 
-  console.log('🌱 Seeding data...');
-  execSync('npm run prisma:seed', { stdio: 'inherit' });
+    logger.info('🧹 Resetting database...');
+    execSync('pnpm run prisma:reset', { stdio: 'inherit' });
 
-  console.log('✅ Prisma setup complete!');
-} catch (err) {
-  console.error('❌ Failed to setup Prisma:', err);
-  process.exit(1);
+    logger.info('⚙️ Generating Prisma client...');
+    execSync('pnpm run prisma:generate', { stdio: 'inherit' });
+
+    logger.info('🌱 Seeding database...');
+    execSync('pnpm run prisma:seed', { stdio: 'inherit' });
+
+    logger.info('✅ Prisma setup complete!');
+  } catch (err) {
+    console.error('❌ Failed to setup Prisma:', err instanceof Error ? err.message : err);
+    process.exit(1);
+  }
 }
 
-// This script automates the Prisma setup process by resetting the database, generating the Prisma client, and seeding initial data. It uses `execSync` to run the necessary npm scripts and handles any errors that may occur during the process.
+runSetup();
