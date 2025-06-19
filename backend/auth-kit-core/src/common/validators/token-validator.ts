@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TokenTypeEnum } from "../constants/prisma-enums/role.enum";
+import { TokenTypeEnum } from "@prisma-enums/role.enum";
 
 export const tokenTypeSchema = z.nativeEnum(TokenTypeEnum);
 

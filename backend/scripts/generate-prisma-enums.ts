@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { format as prettierFormat } from 'prettier';
-import { logger } from '@utils/logger';
+import { logger } from '@utils';
 
 const SCHEMA_PATH = path.resolve('prisma/schema.prisma');
 const OUTPUT_DIR = path.resolve('auth-kit-core/src/common/constants/prisma-enums');

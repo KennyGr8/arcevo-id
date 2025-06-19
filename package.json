@@ -1,0 +1,22 @@
+{
+  "name": "arcevo-id-monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "backend",
+    "backend/auth-kit-core",
+    "backend/scripts",
+    "backend/cli",
+    "adapters"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter auth-kit-core dev"
+  },
+  "devDependencies": {
+    "chokidar": "^4.0.3",
+    "fs-extra": "^11.3.0"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
+  }
+}

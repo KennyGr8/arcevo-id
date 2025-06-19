@@ -1,4 +1,4 @@
-import { AccessTokenPayload } from "@utils/jwt";
+import { AccessTokenPayload } from "@utils";
 
 export type JwtClaimTemplate = (
   payload: AccessTokenPayload

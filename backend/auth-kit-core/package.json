@@ -1,12 +1,11 @@
 {
-  "name": "@voltix/auth-kit-core",
+  "name": "@arcevo-id/auth-kit-core",
   "version": "1.0.0",
   "description": "",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx -r tsconfig-paths/register src/index.ts",
-    "build": "tsc -p tsconfig.json"
+    "dev": "tsx -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",

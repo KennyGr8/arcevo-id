@@ -3,14 +3,13 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import passport from "@/middleware/passport";
-import { config } from "@/database/config/app.config";
-import { logger } from "@/common/utils/logger";
-import { connectRedis } from "@/common/utils/redis";
-import { initJobModule } from "@/common/queues/jobs.module";
-import { errorHandler } from "@/middleware/errorHandler";
-import { asyncHandler } from "@/middleware/asyncHandler";
-import { authenticateJWT } from "@/common/strategies/jwt.strategy";
+import passport from "@middleware/passport";
+import { config } from "@database/config/app.config";
+import { logger, connectRedis } from "@utils";
+import { initJobModule } from "@common/queues/jobs.module";
+import { errorHandler } from "@middleware/errorHandler";
+import { asyncHandler } from "@middleware/asyncHandler";
+import { authenticateJWT } from "@strategies/jwt.strategy";
 
 // Routes
 import routes from "@/modules"; // 🔥 All routes registered modularly

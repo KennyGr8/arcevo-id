@@ -1,6 +1,6 @@
 import { prisma } from "@database";
 import { config } from "@database/config/app.config";
-import { logger } from "@utils/logger";
+import { logger } from "@utils";
 
 const LOG_RETENTION_DAYS = Number(config.LOG_RETENTION_DAYS) || 90;
 
