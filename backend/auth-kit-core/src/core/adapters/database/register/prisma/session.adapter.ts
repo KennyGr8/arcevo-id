@@ -1,38 +1,33 @@
+import { prisma, SessionModel } from "@database";
+import * as DTO from "@contracts/generated/dto";
 import type { ISessionAdapter } from "@interfaces/database";
-import type { SessionAdapter } from "@contracts/generated/types";
-import { prisma } from "@database";
-import type { SessionModel } from "@database/prisma";
 
-export class PrismaSessionAdapter implements ISessionAdapter<SessionAdapter> {
-  async findAllByUser(userId: string): Promise<SessionAdapter[]> {
-    const sessions = await prisma.session.findMany({ where: { userId } });
-    return sessions.map(this.toModel);
-  }
-
-  async findById(id: string): Promise<SessionAdapter | null> {
-    const session = await prisma.session.findUnique({ where: { id } });
-    return session ? this.toModel(session) : null;
-  }
-
-  async delete(id: string): Promise<boolean> {
+export const PrismaSessionAdapter: ISessionAdapter<SessionModel> = {
+  async findAllByUser(userId) {
+    return prisma.session.findMany({ where: { userId } });
+  },
+  async findById(id) {
+    return prisma.session.findUnique({ where: { id } });
+  },
+  async create(data) {
+    return prisma.session.create({ data });
+  },
+  async update(id, data) {
+    return prisma.session.update({ where: { id }, data });
+  },
+  async delete(id) {
     await prisma.session.delete({ where: { id } });
-    return true;
-  }
-
-  private toModel(session: SessionModel): SessionAdapter {
-    return {
-      id: session.id,
-      userId: session.userId,
-      ip: session.ip,
-      userAgent: session.userAgent,
-      createdAt: session.createdAt,
-      expiresAt: session.expiresAt,
-      valid: session.valid,
-      lastActiveAt: session.lastActiveAt,
-      deviceName: session.deviceName,
-      browser: session.browser,
-      platform: session.platform,
-      location: session.location,
-    };
-  }
-}
+  },
+  async revokeAll(userId) {
+    await prisma.session.updateMany({
+      where: { userId },
+      data: { valid: false },
+    });
+  },
+	async revokeCurrent(userId) {
+		await prisma.session.update({
+			where: { userId },
+			data: { valid: false },
+		});
+	}
+};

@@ -25,7 +25,6 @@
     "format": "prettier --write . && pnpm prisma:format",
     "watch": "tsx scripts/watch.ts",
     "prisma:watch": "pnpm prisma:build-schema --watch",
-
     "env:validate": "tsx auth-kit-core/common/validators/env.config.ts",
     "utils:index": "tsx scripts/generate-utils-index.ts",
     "generate:db-contracts": "pnpm prisma:build-schema && tsx scripts/generate-contracts.ts",
@@ -75,6 +74,7 @@
     "qrcode": "^1.5.4",
     "redis": "^5.1.0",
     "speakeasy": "^2.0.0",
+    "ts-morph": "^26.0.0",
     "twilio": "^5.5.2",
     "ua-parser-js": "^2.0.3",
     "uuid": "^11.1.0",

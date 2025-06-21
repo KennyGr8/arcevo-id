@@ -1,32 +1,21 @@
-import type { IAuthLogAdapter } from "@interfaces/database";
-import type { AuthLogAdapter } from "@contracts/generated/types";
 import { prisma, AuthLogModel } from "@database";
-import type { AuthEvent } from "@prisma-enums";
-import DTO from "@modules/auth-log/auth-log.dto";
+import * as DTO from "@contracts/generated/dto";
+import type { IAuthLogAdapter } from "@interfaces/database";
 
-export class PrismaAuthLogAdapter implements IAuthLogAdapter<AuthLogAdapter> {
-  async logEvent(data: DTO.CreateAuthLogDto): Promise<AuthLogAdapter> {
-    const log = await prisma.authLog.create({ data });
-    return this.toModel(log);
+export const PrismaAuthLogAdapter: IAuthLogAdapter<AuthLogModel> = {
+  async findByUser(userId) {
+    return prisma.authLog.findMany({ where: { userId } });
+  },
+  async findById(id) {
+    return prisma.authLog.findUnique({ where: { id } });
+  },
+  async create(data) {
+    return prisma.authLog.create({ data });
+  },
+  async delete(id) {
+    await prisma.authLog.delete({ where: { id } });
+  },
+  async deleteAllForUser(userId) {
+    await prisma.authLog.deleteMany({ where: { userId } });
   }
-
-  async getUserLogs(userId: string, limit = 10): Promise<AuthLogAdapter[]> {
-    const logs = await prisma.authLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-    });
-    return logs.map(this.toModel);
-  }
-
-  async getLogsByEvent(event: AuthEvent): Promise<AuthLogAdapter[]> {
-    const logs = await prisma.authLog.findMany({ where: { event } });
-    return logs.map(this.toModel);
-  }
-
-  private toModel(data: AuthLogModel): AuthLogAdapter {
-    return {
-      ...data,
-    };
-  }
-}
+};

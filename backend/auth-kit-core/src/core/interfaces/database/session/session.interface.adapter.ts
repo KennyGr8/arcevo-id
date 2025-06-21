@@ -1,7 +1,7 @@
 import * as DTO from "./session.dto";
 
 export interface ISessionAdapter<TModel = unknown> {
-  findAllForUser(userId: string): Promise<TModel[]>;
+  findAllByUser(userId: string): Promise<TModel[]>;
   findById(id: string): Promise<TModel | null>;
   create(data: DTO.CreateSessionDto): Promise<TModel>;
   update(id: string, data: DTO.UpdateSessionDto): Promise<TModel>;

@@ -1,18 +1,18 @@
-import { prisma, ActivityLogModel } from "@database/prisma";
+import { prisma, ActivityLogModel } from "@database";
+import * as DTO from "@contracts/generated/dto";
 import type { IActivityLogAdapter } from "@interfaces/database";
 
-export const ActivityLogAdapter: IActivityLogAdapter<ActivityLogModel> = {
-  logActivity(data) {
+export const PrismaActivityLogAdapter: IActivityLogAdapter<ActivityLogModel> = {
+  async findByUser(userId) {
+    return prisma.activityLog.findMany({ where: { userId } });
+  },
+  async create(data) {
     return prisma.activityLog.create({ data });
   },
-  getUserActivity(userId, limit = 10) {
-    return prisma.activityLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: limit
-    });
+  async delete(id) {
+    await prisma.activityLog.delete({ where: { id } });
   },
-  getActivitiesByType(type) {
-    return prisma.activityLog.findMany({ where: { type } });
+  async deleteAllForUser(userId) {
+    await prisma.activityLog.deleteMany({ where: { userId } });
   }
 };
