@@ -4,15 +4,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { logger } from '@utils/logger';
 
+console.log("✅ DATABASE_URL =", process.env.DATABASE_URL);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const schemaHeader = `// THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
-// Modify individual schema parts in the prisma/schemas directory.
+// Modify individual schema parts in the adapters/database/prisma/schemas directory.
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../auth-kit-core/src/generated/prisma"
+  output   = "../../auth-kit-core/src/generated/prisma"
 }
 
 datasource db {
@@ -22,12 +24,10 @@ datasource db {
 
 generator seed {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  output   = "../../node_modules/.prisma/client"
 }`.trim();
 
-/**
- * Recursively gets all files ending with the given extension
- */
+// Utility to collect files recursively
 async function getPrismaFilesRecursive(dir: string, extension: string): Promise<string[]> {
   const result: string[] = [];
 
@@ -45,17 +45,16 @@ async function getPrismaFilesRecursive(dir: string, extension: string): Promise<
   }
 
   await traverse(dir);
-  return result.sort(); // consistent order
+  return result.sort(); // consistent output order
 }
 
-/**
- * Build Prisma schema by combining schema and enum files
- */
+// Main builder
 export async function buildSchema(dryRun = false) {
   try {
-    const schemasDir = path.resolve(__dirname, '../prisma/schemas');
-    const enumsDir = path.resolve(schemasDir, 'enums');
-    const outputFile = path.resolve(__dirname, '../prisma/schema.prisma');
+    const prismaDir = path.resolve(__dirname, '../adapters/database/prisma');
+    const schemasDir = path.join(prismaDir, 'schemas');
+    const enumsDir = path.join(schemasDir, 'enums');
+    const outputFile = path.join(prismaDir, 'schema.prisma');
 
     logger.info(`🔍 Scanning schemas in: ${schemasDir}`);
     logger.info(`🔍 Scanning enums in: ${enumsDir}`);
@@ -69,14 +68,12 @@ export async function buildSchema(dryRun = false) {
     }
 
     const allFiles = [...enumFiles, ...schemaFiles];
-
     const seen = new Set<string>();
     const parts: string[] = [];
 
     for (const filePath of allFiles) {
       const content = await fs.readFile(filePath, 'utf-8');
-
-      const relativePath = path.relative(path.resolve(__dirname, '../'), filePath);
+      const relativePath = path.relative(prismaDir, filePath);
       const sanitizedContent = content
         .replace(/generator\s+\w+\s+\{[^}]*\}/g, '')
         .replace(/datasource\s+\w+\s+\{[^}]*\}/g, '')

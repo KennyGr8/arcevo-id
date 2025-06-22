@@ -50,7 +50,7 @@ export function is${pascal}(value: string): value is ${pascal}Values {
 }
 `;
 
-  return `// Auto-generated from Prisma schema. Do not edit manually.
+  return `// Auto-generated from Prisma schema. Do not edit manually. You can run or regenerate with pnpm generate:prisma-enums
 
 export enum ${pascal} {
 ${body}

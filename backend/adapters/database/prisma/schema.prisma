@@ -1,22 +1,22 @@
 // THIS FILE IS AUTO-GENERATED. DO NOT EDIT DIRECTLY.
-// Modify individual schema parts in the prisma/schemas directory.
+// Modify individual schema parts in the adapters/database/prisma/schemas directory.
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../auth-kit-core/src/generated/prisma"
+  output   = "../../auth-kit-core/src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL_PRISMA")
+  url      = env("DATABASE_URL")
 }
 
 generator seed {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  output   = "../../node_modules/.prisma/client"
 }
 
-// --- File: prisma\schemas\enums\activity-type.enum.prisma ---
+// --- File: schemas\enums\activity-type.enum.prisma ---
 
 enum ActivityType {
   LOGIN
@@ -25,7 +25,7 @@ enum ActivityType {
   PASSWORD_RESET
 }
 
-// --- File: prisma\schemas\enums\admin-action.enum.prisma ---
+// --- File: schemas\enums\admin-action.enum.prisma ---
 
 enum AdminAction {
   USER_BAN
@@ -37,7 +37,7 @@ enum AdminAction {
   SUBSCRIPTION_UPDATED
 }
 
-// --- File: prisma\schemas\enums\auth-event.enum.prisma ---
+// --- File: schemas\enums\auth-event.enum.prisma ---
 
 enum AuthEvent {
   LOGIN
@@ -49,7 +49,7 @@ enum AuthEvent {
   TOKEN_EXPIRED
 }
 
-// --- File: prisma\schemas\enums\billing-event-type.enum.prisma ---
+// --- File: schemas\enums\billing-event-type.enum.prisma ---
 
 enum BillingEventType {
   SUBSCRIPTION_CREATED
@@ -66,7 +66,7 @@ enum BillingEventType {
   PROVIDER_SYNC
 }
 
-// --- File: prisma\schemas\enums\billing-provider.enum.prisma ---
+// --- File: schemas\enums\billing-provider.enum.prisma ---
 
 enum BillingProvider {
   STRIPE
@@ -74,7 +74,7 @@ enum BillingProvider {
   LEMONSQUEEZY
 }
 
-// --- File: prisma\schemas\enums\oauth-provider.enum.prisma ---
+// --- File: schemas\enums\oauth-provider.enum.prisma ---
 
 enum OAuthProvider {
   GITHUB
@@ -92,7 +92,7 @@ enum Web3OAuthProvider {
 	BITCOIN
 }
 
-// --- File: prisma\schemas\enums\organization-role.enum.prisma ---
+// --- File: schemas\enums\organization-role.enum.prisma ---
 
 enum OrganizationRole {
   OWNER
@@ -101,7 +101,7 @@ enum OrganizationRole {
   GUEST
 }
 
-// --- File: prisma\schemas\enums\role.enum.prisma ---
+// --- File: schemas\enums\role.enum.prisma ---
 
 enum Role {
   USER
@@ -110,7 +110,7 @@ enum Role {
   ADMIN
 }
 
-// --- File: prisma\schemas\enums\subscription-plan.enum.prisma ---
+// --- File: schemas\enums\subscription-plan.enum.prisma ---
 
 enum SubscriptionPlan {
   FREE
@@ -120,7 +120,7 @@ enum SubscriptionPlan {
 	EDUCATOR
 }
 
-// --- File: prisma\schemas\enums\subscription-provider.enum.prisma ---
+// --- File: schemas\enums\subscription-provider.enum.prisma ---
 
 enum SubscriptionProvider {
   STRIPE
@@ -128,7 +128,7 @@ enum SubscriptionProvider {
   LEMONSQUEEZY
 }
 
-// --- File: prisma\schemas\enums\subscription-status.enum.prisma ---
+// --- File: schemas\enums\subscription-status.enum.prisma ---
 
 enum SubscriptionStatus {
   ACTIVE
@@ -138,7 +138,7 @@ enum SubscriptionStatus {
 	RENEWED
 }
 
-// --- File: prisma\schemas\enums\token-type.enum.prisma ---
+// --- File: schemas\enums\token-type.enum.prisma ---
 
 enum TokenType {
   VERIFY_EMAIL
@@ -147,7 +147,7 @@ enum TokenType {
   TOTP
 }
 
-// --- File: prisma\schemas\enums\user-status.enum.prisma ---
+// --- File: schemas\enums\user-status.enum.prisma ---
 
 enum UserStatus {
   active
@@ -155,7 +155,7 @@ enum UserStatus {
   banned
 }
 
-// --- File: prisma\schemas\activity-log.prisma ---
+// --- File: schemas\activity-log.prisma ---
 
 model ActivityLog {
   id        String   @id @default(uuid())
@@ -172,7 +172,7 @@ model ActivityLog {
   @@index([createdAt])
 }
 
-// --- File: prisma\schemas\admin-audit-log.prisma ---
+// --- File: schemas\admin-audit-log.prisma ---
 
 model AdminAuditLog {
   id        String   @id @default(uuid())
@@ -188,7 +188,7 @@ model AdminAuditLog {
   @@index([createdAt])
 }
 
-// --- File: prisma\schemas\auth-log.prisma ---
+// --- File: schemas\auth-log.prisma ---
 
 model AuthLog {
   id              String   @id @default(uuid())
@@ -208,7 +208,7 @@ model AuthLog {
   @@index([createdAt])
 }
 
-// --- File: prisma\schemas\billing-event.prisma ---
+// --- File: schemas\billing-event.prisma ---
 
 model BillingEvent {
   id             String               @id @default(uuid())
@@ -231,7 +231,7 @@ model BillingEvent {
   @@index([createdAt])
 }
 
-// --- File: prisma\schemas\email-token.prisma ---
+// --- File: schemas\email-token.prisma ---
 
 model EmailToken {
   id        String    @id @default(uuid())
@@ -248,7 +248,7 @@ model EmailToken {
   @@index([expiresAt])
 }
 
-// --- File: prisma\schemas\mfa.prisma ---
+// --- File: schemas\mfa.prisma ---
 
 model MFA {
   id          String            @id @default(uuid())
@@ -274,7 +274,7 @@ model MFA_BackupCode {
   @@index([usedAt])
 }
 
-// --- File: prisma\schemas\oauth-account.prisma ---
+// --- File: schemas\oauth-account.prisma ---
 
 model OAuthAccount {
   id             String    @id @default(uuid())
@@ -292,7 +292,7 @@ model OAuthAccount {
   @@index([provider])
 }
 
-// --- File: prisma\schemas\organization-domain.prisma ---
+// --- File: schemas\organization-domain.prisma ---
 
 model OrganizationDomain {
   id             String        @id @default(uuid())
@@ -302,7 +302,7 @@ model OrganizationDomain {
   verified       Boolean       @default(false)
 }
 
-// --- File: prisma\schemas\organization-invite.prisma ---
+// --- File: schemas\organization-invite.prisma ---
 
 model OrganizationInvite {
   id             String    @id @default(uuid())
@@ -323,7 +323,7 @@ model OrganizationInvite {
   @@index([email])
 }
 
-// --- File: prisma\schemas\organization-membership.prisma ---
+// --- File: schemas\organization-membership.prisma ---
 
 model OrganizationMembership {
   id             String        @id @default(uuid())
@@ -342,7 +342,7 @@ model OrganizationMembership {
   @@unique([userId, organizationId])
 }
 
-// --- File: prisma\schemas\organization-sso-provider.prisma ---
+// --- File: schemas\organization-sso-provider.prisma ---
 
 model OrganizationSSOProvider {
   id               String     @id @default(uuid())
@@ -355,7 +355,7 @@ model OrganizationSSOProvider {
   @@index([organizationId])
 }
 
-// --- File: prisma\schemas\organization.prisma ---
+// --- File: schemas\organization.prisma ---
 
 model Organization {
   id          String        @id @default(uuid())
@@ -370,7 +370,7 @@ model Organization {
   ssoProviders OrganizationSSOProvider[]
 }
 
-// --- File: prisma\schemas\session.prisma ---
+// --- File: schemas\session.prisma ---
 
 model Session {
   id              String    @id @default(uuid())
@@ -399,7 +399,7 @@ model Session {
   @@index([valid])
 }
 
-// --- File: prisma\schemas\subscription.prisma ---
+// --- File: schemas\subscription.prisma ---
 
 model Subscription {
   id                  String               @id @default(uuid())
@@ -432,7 +432,7 @@ model Subscription {
   @@index([currentPeriodEnd])
 }
 
-// --- File: prisma\schemas\user.prisma ---
+// --- File: schemas\user.prisma ---
 
 model User {
   id            String    @id @default(uuid())

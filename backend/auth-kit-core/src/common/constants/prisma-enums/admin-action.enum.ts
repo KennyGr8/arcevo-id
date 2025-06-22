@@ -1,4 +1,4 @@
-// Auto-generated from Prisma schema. Do not edit manually.
+// Auto-generated from Prisma schema. Do not edit manually. You can run or regenerate with pnpm generate:prisma-enums
 
 export enum AdminAction {
   USER_BAN = 'USER_BAN',
