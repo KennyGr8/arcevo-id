@@ -48,3 +48,24 @@
 2025-06-22 12:03:31 [INFO]: 🔍 Scanning enums in: C:\Users\USER\Desktop\Projects\ArcevoStack\arcevo-id\backend\adapters\database\prisma\schemas\enums
 2025-06-22 12:03:32 [INFO]: ✅ schema.prisma generated at C:\Users\USER\Desktop\Projects\ArcevoStack\arcevo-id\backend\adapters\database\prisma\schema.prisma
 2025-06-22 12:03:32 [INFO]: ✅ schema.prisma build completed!
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\activity-type.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\admin-action.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\auth-event.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\billing-event-type.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\billing-provider.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\oauth-provider.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\social-oauth-provider.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\web3oauth-provider.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\organization-role.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\role.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-plan.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-provider.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\subscription-status.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\token-type.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ Wrote auth-kit-core\src\common\constants\prisma-enums\user-status.enum.ts
+2025-06-22 12:03:35 [INFO]: ✅ 📦 Enums index generated (15 exports) → auth-kit-core\src\common\constants\prisma-enums\index.ts
+2025-06-22 12:03:36 [INFO]: ✅ ✅ Changes committed to Git
+2025-06-22 12:06:25 [INFO]: 📦 Building Prisma schema...
+2025-06-22 12:06:25 [INFO]: 🔍 Scanning schemas in: C:\Users\USER\Desktop\Projects\ArcevoStack\arcevo-id\backend\adapters\database\prisma\schemas
+2025-06-22 12:06:25 [INFO]: 🔍 Scanning enums in: C:\Users\USER\Desktop\Projects\ArcevoStack\arcevo-id\backend\adapters\database\prisma\schemas\enums
+2025-06-22 12:06:25 [INFO]: ✅ schema.prisma generated at C:\Users\USER\Desktop\Projects\ArcevoStack\arcevo-id\backend\adapters\database\prisma\schema.prisma
