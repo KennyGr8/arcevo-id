@@ -1,3 +1,5 @@
+// src/common/utils/get-env.ts
+
 import { env } from "@validators/env.config";
 
 export const getEnv = (key: keyof typeof env, defaultValue?: string): string => {

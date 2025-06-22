@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "dotenv-flow/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -7,6 +7,7 @@ import passport from "@middleware/passport";
 import { config } from "@database/config/app.config";
 import { logger, connectRedis } from "@utils";
 import { initJobModule } from "@common/queues/jobs.module";
+import { connectToMongoose } fron "@database/logic";
 import { errorHandler } from "@middleware/errorHandler";
 import { asyncHandler } from "@middleware/asyncHandler";
 import { authenticateJWT } from "@strategies/jwt.strategy";
@@ -58,6 +59,8 @@ async function startServer() {
 
     await initJobModule(); // BullMQ jobs
     logger.info("📦 Jobs initialized");
+
+    await connectToMongoose();
 
     app.listen(config.PORT, () => {
       logger.info(`🚀 NexaAuth running on http://localhost:${config.PORT} [${config.NODE_ENV}]`);

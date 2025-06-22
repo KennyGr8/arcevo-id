@@ -1,19 +1,28 @@
-// core/adapters/database/registry.ts
+import type { AdapterRegistry } from "@/@types/adapter-registry";
 
-import { ConvexAdapterRegistry } from "./register/convex"; // dynamic in future
-import { CustomAdapterRegistry } from "./register/custom"; // dynamic in future
-import { FirebaseAdapterRegistry } from "./register/firebase"; // dynamic in future
-import { MongoAdapterRegistry } from "./register/mongo"; // dynamic in future
-import { NeonAdapterRegistry } from "./register/neon"; // dynamic in future
-import { PrismaAdapterRegistry } from "./register/prisma"; // dynamic in future
-import { SupabaseAdapterRegistry } from "./register/supabase"; // dynamic in future
+import { PrismaAdapterRegistry } from "./register/prisma";
+import { MongoAdapterRegistry } from "./register/mongo";
+import { ConvexAdapterRegistry } from "./register/convex";
+import { NeonAdapterRegistry } from "./register/neon";
 
-export const adapter = {
-  convex: ConvexAdapterRegistry,
-  custom: CustomAdapterRegistry,
-  firebase: FirebaseAdapterRegistry,
-  mongo: MongoAdapterRegistry,
-  neon: NeonAdapterRegistry,
+// import { SupabaseAdapterRegistry } from "./register/supabase";
+// import { FirebaseAdapterRegistry } from "./register/firebase";
+// import { CustomAdapterRegistry } from "./register/custom";
+
+/**
+ * All supported providers and their registry bindings.
+ * Add/remove from here to extend support.
+ */
+export const adapter: Record<DatabaseProvider, AdapterRegistry> = {
   prisma: PrismaAdapterRegistry,
-  supabase: SupabaseAdapterRegistry,
-}
+  mongo: MongoAdapterRegistry,
+  convex: ConvexAdapterRegistry,
+
+  // Future support
+  // neon: NeonAdapterRegistry,
+  // supabase: SupabaseAdapterRegistry,
+  // firebase: FirebaseAdapterRegistry,
+  // custom: CustomAdapterRegistry,
+};
+
+export type DatabaseProvider = keyof typeof adapter;

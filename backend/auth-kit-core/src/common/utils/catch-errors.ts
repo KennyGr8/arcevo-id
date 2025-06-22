@@ -1,4 +1,4 @@
-import { HTTPSTATUS, HttpStatusCode } from "@database/config/http.config";
+import { HTTPSTATUS, HttpStatusCode } from "@database/config";
 import { ErrorCode } from "@enums/error-code.enum";
 import { AppError } from "./AppError";
 

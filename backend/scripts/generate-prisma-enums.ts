@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { format as prettierFormat } from 'prettier';
-import { logger } from '@utils';
+import { logger } from '@utils/logger';
 
-const SCHEMA_PATH = path.resolve('prisma/schema.prisma');
+const SCHEMA_PATH = path.resolve('adapters/database/prisma/schema.prisma');
 const OUTPUT_DIR = path.resolve('auth-kit-core/src/common/constants/prisma-enums');
 
 function toPascalCase(input: string) {

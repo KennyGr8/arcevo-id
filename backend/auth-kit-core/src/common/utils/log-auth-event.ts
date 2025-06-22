@@ -1,5 +1,5 @@
 import { UAParser } from "ua-parser-js";
-import { prisma } from "@database";
+import { prisma } from "@database/logic";
 import geoip from "geoip-lite";
 
 export async function logAuthEvent({

@@ -15,6 +15,7 @@ import { MongoMFABackupCodeAdapter } from "./mfa-backup-code.adapter";
 import { MongoSubscriptionAdapter } from "./subscription.adapter";
 import { MongoBillingEventAdapter } from "./billing-event.adapter";
 import { MongoOrganizationDomainAdapter } from "./organization-domain.adapter";
+import { MongoOrganizationAdapter } from "./organization.adapter";
 import { MongoOrganizationInviteAdapter } from "./organization-invite.adapter";
 import { MongoOrganizationMembershipAdapter } from "./organization-membership.adapter";
 import { MongoOrganizationSSOProviderAdapter } from "./organization-sso-provider.adapter";

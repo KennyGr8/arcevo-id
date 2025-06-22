@@ -14,7 +14,7 @@ import {
   IOrganizationInviteAdapter,
   IOrganizationMembershipAdapter,
   IOrganizationSSOProviderAdapter,
-} from "@/core/interfaces/database";
+} from "@interfaces/database";
 
 export interface AdapterRegistry {
   user: IUserAdapter;

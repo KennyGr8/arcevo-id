@@ -1,5 +1,5 @@
 import { CookieOptions, Response } from "express";
-import { config } from "@database/config/app.config";
+import { config } from "@database/config";
 import { calculateExpirationDate } from "./date-time";
 
 type CookiePayloadType = {

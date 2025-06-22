@@ -1,5 +1,5 @@
 import jwt, { SignOptions, VerifyOptions } from "jsonwebtoken";
-import { config } from "@database/config/app.config";
+import { config } from "@database/config";
 import { jwtTemplates } from "@strategies/jwt-templates.config";
 
 export type AccessTokenPayload = {

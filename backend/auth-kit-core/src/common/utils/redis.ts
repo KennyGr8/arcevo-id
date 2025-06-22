@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { config } from "@database/config/app.config";
+import { config } from "@database/config";
 
 export let redis: Redis;
 

@@ -1,4 +1,4 @@
-import { prisma } from "@database";
+import { prisma } from "@database/logic";
 
 export async function logActivity(
   userId: string,

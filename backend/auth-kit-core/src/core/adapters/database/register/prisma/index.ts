@@ -15,6 +15,7 @@ import { PrismaMFABackupCodeAdapter } from "./mfa-backup-code.adapter";
 import { PrismaSubscriptionAdapter } from "./subscription.adapter";
 import { PrismaBillingEventAdapter } from "./billing-event.adapter";
 import { PrismaOrganizationDomainAdapter } from "./organization-domain.adapter";
+import { PrismaOrganizationAdapter } from "./organization.adapter";
 import { PrismaOrganizationInviteAdapter } from "./organization-invite.adapter";
 import { PrismaOrganizationMembershipAdapter } from "./organization-membership.adapter";
 import { PrismaOrganizationSSOProviderAdapter } from "./organization-sso-provider.adapter";
@@ -32,6 +33,7 @@ export const PrismaAdapterRegistry: AdapterRegistry = {
   mfaBackupCode: PrismaMFABackupCodeAdapter,
   subscription: PrismaSubscriptionAdapter,
   billingEvent: PrismaBillingEventAdapter,
+  organization: PrismaOrganizationAdapter,
   organizationDomain: PrismaOrganizationDomainAdapter,
   organizationInvite: PrismaOrganizationInviteAdapter,
   organizationMembership: PrismaOrganizationMembershipAdapter,

@@ -1,7 +1,7 @@
 import { ExtractJwt, Strategy as JwtStrategy, StrategyOptionsWithRequest } from "passport-jwt";
-import { UnauthorizedException } from "@utils";
+import { UnauthorizedException } from "@utils/catch-error";
 import { ErrorCode } from "@enums/error-code.enum";
-import { config } from "@database/config/app.config";
+import { config } from "@database/config";
 import passport, { PassportStatic } from "passport";
 import { SafeUser } from "@/@types/user";
 import { userService } from "@services/user.service";
