@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { logger } from '@utils/logger';
 
-console.log("✅ DATABASE_URL =", process.env.DATABASE_URL);
+logger.info("✅ DATABASE_URL =", process.env.DATABASE_URL);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
