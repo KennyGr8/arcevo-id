@@ -34,7 +34,7 @@
     "prisma:build-schema": "tsx scripts/prisma-build-schema.ts",
     "prisma:format": "pnpm prisma:build-schema && prisma format --schema=prisma/schema.prisma",
     "prisma:migrate": "pnpm prisma:build-schema && prisma migrate dev --schema=adapters/database/prisma/schema.prisma",
-    "prisma:generate": "pnpm prisma:build-schema && prisma generate --schema=prisma/schema.prisma",
+    "prisma:generate": "pnpm prisma:build-schema && prisma generate --schema=adapters/database/prisma/schema.prisma",
     "prisma:reset": "pnpm prisma:build-schema && prisma migrate reset --force --schema=prisma/schema.prisma",
     "prisma:seed": "pnpm prisma:build-schema && prisma db seed",
     "prismadb:setup": "tsx scripts/setup-prisma.ts",

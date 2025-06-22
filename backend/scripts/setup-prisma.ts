@@ -21,7 +21,12 @@ async function runSetup() {
 
     logger.info('✅ Prisma setup complete!');
   } catch (err) {
-    console.error('❌ Failed to setup Prisma:', err instanceof Error ? err.message : err);
+    logger.error('❌ Failed to setup Prisma script:');
+    if (err instanceof Error) {
+      logger.error(err.message);
+    } else {
+      logger.error(JSON.stringify(err, null, 2));
+    }
     process.exit(1);
   }
 }
