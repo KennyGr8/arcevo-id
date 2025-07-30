@@ -31,7 +31,6 @@
     "generate:prisma-enums": "pnpm prisma:build-schema && tsx scripts/generate-prisma-enums.ts",
     "prisma:enums:auto": "pnpm generate:prisma-enums && git add . && git commit -m \"chore: regenerate prisma enums\" || echo \"No changes to commit\"",
     "patch:configs": "tsx scripts/patch-configs.ts",
-    "prisma:build-schema": "cross-env NODE_OPTIONS=--max-old-space-size=32768 tsx scripts/prisma-build-schema.ts",
     "prisma:build-schema": "cross-env NODE_OPTIONS='--max-old-space-size=32768 --expose-gc' tsx scripts/prisma-build-schema.ts",
     "prisma:build-schema:dry": "pnpm prisma:build-schema --dry",
     "prisma:build-schema:debug": "cross-env NODE_OPTIONS='--max-old-space-size=32768 --expose-gc' DEBUG=* tsx scripts/prisma-build-schema.ts",
