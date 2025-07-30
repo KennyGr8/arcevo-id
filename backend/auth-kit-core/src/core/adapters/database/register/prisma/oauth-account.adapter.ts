@@ -1,5 +1,4 @@
-import { prisma, OAuthAccountModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, OAuthAccountModel } from "@database/logic";
 import type { IOAuthAdapter } from "@interfaces/database";
 
 export const PrismaOAuthAdapter: IOAuthAdapter<OAuthAccountModel> = {

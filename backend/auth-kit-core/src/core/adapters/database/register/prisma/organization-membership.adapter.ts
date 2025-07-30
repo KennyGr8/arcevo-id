@@ -1,5 +1,4 @@
-import { prisma, OrganizationMembershipModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, OrganizationMembershipModel } from "@database/logic";
 import type { IOrganizationMembershipAdapter } from "@interfaces/database";
 
 export const PrismaOrganizationMembershipAdapter: IOrganizationMembershipAdapter<OrganizationMembershipModel> = {

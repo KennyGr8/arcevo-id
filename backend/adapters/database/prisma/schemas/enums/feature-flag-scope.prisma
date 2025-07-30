@@ -1,0 +1,6 @@
+enum FeatureFlagScope {
+  USER
+  ORG
+  GLOBAL
+  BETA_TESTER
+}

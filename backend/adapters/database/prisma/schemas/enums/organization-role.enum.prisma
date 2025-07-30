@@ -3,4 +3,7 @@ enum OrganizationRole {
   ADMIN
   MEMBER
   GUEST
+  BILLING
+  CONTRIBUTOR
+  VIEWER
 }

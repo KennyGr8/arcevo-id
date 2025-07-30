@@ -1,0 +1,22 @@
+model Device {
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id])
+
+  fingerprint      String    @unique
+  deviceName       String?
+  platform         String?
+  browser          String?
+  ip               String?
+  locationCity     String?
+  locationCountry  String?
+  isTrusted        Boolean   @default(false)
+
+  sessions         Session[]
+
+  firstSeenAt      DateTime  @default(now())
+  lastSeenAt       DateTime
+
+  @@index([userId])
+  @@index([fingerprint])
+}

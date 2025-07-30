@@ -1,0 +1,14 @@
+model WebhookEventLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  provider   String   // stripe, paystack, etc.
+  eventType  String
+  status     String?
+  payload    Json
+  receivedAt DateTime @default(now())
+
+  @@index([provider])
+  @@index([eventType])
+  @@index([userId])
+}

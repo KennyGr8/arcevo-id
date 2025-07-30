@@ -1,5 +1,4 @@
-import { prisma, MFABackupCodeModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, MFABackupCodeModel } from "@database/logic";
 import type { IMFABackupCodeAdapter } from "@interfaces/database";
 
 export const PrismaMFABackupCodeAdapter: IMFABackupCodeAdapter<MFABackupCodeModel> = {

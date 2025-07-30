@@ -1,0 +1,11 @@
+model UserFlag {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  featureFlagId String
+  featureFlag   FeatureFlag @relation(fields: [featureFlagId], references: [id])
+  enabled       Boolean  @default(false)
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, featureFlagId])
+}

@@ -1,5 +1,4 @@
-import { prisma, SessionModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, SessionModel } from "@database/logic";
 import type { ISessionAdapter } from "@interfaces/database";
 
 export const PrismaSessionAdapter: ISessionAdapter<SessionModel> = {

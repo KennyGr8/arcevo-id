@@ -1,0 +1,10 @@
+enum DevicePlatform {
+  WEB
+  ANDROID
+  IOS
+  DESKTOP
+  LINUX
+  WINDOWS
+  MACOS
+  UNKNOWN
+}

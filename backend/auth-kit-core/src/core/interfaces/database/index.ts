@@ -14,3 +14,4 @@ export * from "./organization-domain";
 export * from "./organization-invite";
 export * from "./organization-membership";
 export * from "./organization-sso-provider";
+export * from "./IGenericAdapter"

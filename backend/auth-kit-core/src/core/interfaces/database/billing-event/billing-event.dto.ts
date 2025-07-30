@@ -1,4 +1,4 @@
-import { BillingEventType, SubscriptionProvider } from "@prisma-enums";
+import { BillingEventType, SubscriptionProvider } from "@constants/prisma-enums";
 
 export type CreateBillingEventDto = {
   userId: string;
@@ -7,4 +7,4 @@ export type CreateBillingEventDto = {
   provider: SubscriptionProvider;
   status?: string;
   metadata?: Record<string, any>;
-};
+}

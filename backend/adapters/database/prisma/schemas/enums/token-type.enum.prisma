@@ -3,4 +3,7 @@ enum TokenType {
   RESET_PASSWORD
   MAGIC_LINK
   TOTP
+  INVITE
+  SESSION
+  API_KEY
 }

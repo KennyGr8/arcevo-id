@@ -1,5 +1,4 @@
-import { prisma, SubscriptionModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, SubscriptionModel } from "@database/logic";
 import type { ISubscriptionAdapter } from "@interfaces/database";
 
 export const PrismaSubscriptionAdapter: ISubscriptionAdapter<SubscriptionModel> = {

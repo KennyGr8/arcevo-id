@@ -1,5 +1,4 @@
-import { prisma, OrganizationDomainModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, OrganizationDomainModel } from "@database/logic";
 import type { IOrganizationDomainAdapter } from "@interfaces/database";
 
 export const PrismaOrganizationDomainAdapter: IOrganizationDomainAdapter<OrganizationDomainModel> = {

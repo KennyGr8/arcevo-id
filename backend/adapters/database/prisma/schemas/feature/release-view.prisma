@@ -1,0 +1,10 @@
+model ReleaseView {
+  id            String   @id @default(uuid())
+  releaseId     String
+  release       ReleaseNote @relation(fields: [releaseId], references: [id])
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  viewedAt      DateTime @default(now())
+
+  @@unique([releaseId, userId])
+}

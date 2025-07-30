@@ -2,6 +2,7 @@
 // Run `pnpm utils:index` to regenerate.
 
 export * from './AppError';
+export * from './array.utils';
 export * from './bcrypt';
 export * from './catch-errors';
 export * from './cookie';

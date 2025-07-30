@@ -2,4 +2,5 @@ enum BillingProvider {
   STRIPE
   PAYSTACK
   LEMONSQUEEZY
+  MANUAL
 }

@@ -1,5 +1,4 @@
-import { prisma, OrganizationSSOProviderModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, OrganizationSSOProviderModel } from "@database/logic";
 import type { IOrganizationSSOProviderAdapter } from "@interfaces/database";
 
 export const PrismaOrganizationSSOProviderAdapter: IOrganizationSSOProviderAdapter<OrganizationSSOProviderModel> = {

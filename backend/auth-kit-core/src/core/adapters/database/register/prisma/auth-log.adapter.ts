@@ -1,5 +1,4 @@
-import { prisma, AuthLogModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, AuthLogModel } from "@database/logic";
 import type { IAuthLogAdapter } from "@interfaces/database";
 
 export const PrismaAuthLogAdapter: IAuthLogAdapter<AuthLogModel> = {

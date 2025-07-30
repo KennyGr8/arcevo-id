@@ -3,5 +3,9 @@ enum SubscriptionPlan {
   PREMIUM
   PRO
   ENTERPRISE
-	EDUCATOR
+  EDUCATOR
+  STUDENT
+  NGO
+  LIFETIME
+  CUSTOM
 }

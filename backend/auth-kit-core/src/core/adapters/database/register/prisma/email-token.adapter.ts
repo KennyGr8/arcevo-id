@@ -1,5 +1,4 @@
-import { prisma, EmailTokenModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, EmailTokenModel } from "@database/logic";
 import type { IEmailTokenAdapter } from "@interfaces/database";
 
 export const PrismaEmailTokenAdapter: IEmailTokenAdapter<EmailTokenModel> = {

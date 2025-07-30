@@ -1,5 +1,4 @@
-import { prisma, ActivityLogModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, ActivityLogModel } from "@database/logic";
 import type { IActivityLogAdapter } from "@interfaces/database";
 
 export const PrismaActivityLogAdapter: IActivityLogAdapter<ActivityLogModel> = {

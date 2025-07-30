@@ -1,4 +1,4 @@
-import type { ActivityType } from "@prisma-enums";
+import type { ActivityType } from "@constants/prisma-enums";
 
 export type CreateActivityLogDto = {
   userId: string;

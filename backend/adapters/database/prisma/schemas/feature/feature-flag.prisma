@@ -1,0 +1,8 @@
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  userFlags   UserFlag[]
+}

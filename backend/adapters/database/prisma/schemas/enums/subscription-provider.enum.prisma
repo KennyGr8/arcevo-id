@@ -2,4 +2,6 @@ enum SubscriptionProvider {
   STRIPE
   PAYSTACK
   LEMONSQUEEZY
+  MANUAL
+  INTERNAL
 }

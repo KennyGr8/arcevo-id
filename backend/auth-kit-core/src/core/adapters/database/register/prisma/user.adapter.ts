@@ -1,5 +1,4 @@
-import { prisma, UserModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, UserModel } from "@database/logic";
 import type { IUserAdapter } from "@interfaces/database";
 
 export const PrismaUserAdapter: IUserAdapter<UserModel> = {

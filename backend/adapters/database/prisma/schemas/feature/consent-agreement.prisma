@@ -1,0 +1,13 @@
+model ConsentAgreement {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  consentType String // e.g., "terms_of_service", "privacy_policy"
+  accepted    Boolean @default(false)
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  metadata    Json?
+
+  createdAt   DateTime @default(now())
+}

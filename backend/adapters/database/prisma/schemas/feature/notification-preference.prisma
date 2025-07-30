@@ -1,0 +1,13 @@
+model NotificationPreference {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+
+  emailAuth     Boolean @default(true)
+  emailBilling  Boolean @default(true)
+  emailSecurity Boolean @default(true)
+  smsAlerts     Boolean @default(false)
+  pushAlerts    Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

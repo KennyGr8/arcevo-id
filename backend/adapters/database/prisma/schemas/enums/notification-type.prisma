@@ -1,0 +1,10 @@
+enum NotificationType {
+  SYSTEM
+  SECURITY
+  BILLING
+  MARKETING
+  PRODUCT
+  FEEDBACK
+  SOCIAL
+  ALERT
+}

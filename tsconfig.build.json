@@ -9,16 +9,20 @@
       "@utils/*": ["auth-kit-core/src/common/utils/*"],
       "@strategies/*": ["auth-kit-core/src/common/strategies/*"],
       "@validators/*": ["auth-kit-core/src/common/validators/*"],
-      "@enums/*": ["auth-kit-core/src/common/constants/enums/*"],
-      "@prisma-enums/*": ["auth-kit-core/src/common/constants/prisma-enums/*"],
-      "@config/*": ["auth-kit-core/src/common/configs/*"],
+      "@constants/*": ["auth-kit-core/src/common/constants/*"],
+      "@configs/*": ["auth-kit-core/src/common/configs/*"],
+      "@queues/*": ["auth-kit-core/src/common/queues/*"],
       "@database/*": ["auth-kit-core/src/database/*"],
+      "@generated/*": ["auth-kit-core/src/generated/*"],
       "@modules/*": ["auth-kit-core/src/modules/*"],
       "@middleware/*": ["auth-kit-core/src/middleware/*"],
       "@mailers/*": ["auth-kit-core/src/mailers/*"],
-      "@scripts/*": ["scripts/*"],
-      "@adapters/*": ["adapters/*"],
-      "@prisma/*": ["prisma/*"]
+      "@core/*": ["auth-kit-core/src/core/*"],
+      "@interfaces/*": ["auth-kit-core/src/core/interfaces/*"],
+      "@adapters/*": ["auth-kit-core/src/core/adapters/*"],
+      "@contracts/*": ["auth-kit-core/src/core/contracts*"],
+      "@prisma/*": ["adapters/database/prisma/*"],
+      "@scripts/*": ["scripts/*"]
     }
   }
 }

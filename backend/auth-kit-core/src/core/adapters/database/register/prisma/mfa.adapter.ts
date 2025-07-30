@@ -1,5 +1,4 @@
-import { prisma, MFAModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, MFAModel } from "@database/logic";
 import type { IMFAAdapter } from "@interfaces/database";
 
 export const PrismaMFAAdapter: IMFAAdapter<MFAModel> = {

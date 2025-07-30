@@ -1,4 +1,5 @@
 import type { AdapterRegistry } from "@/@types/adapter-registry";
+import { logger } from "@util/logger"
 
 import { PrismaAdapterRegistry } from "./register/prisma";
 import { MongoAdapterRegistry } from "./register/mongo";
@@ -24,5 +25,10 @@ export const adapter: Record<DatabaseProvider, AdapterRegistry> = {
   // firebase: FirebaseAdapterRegistry,
   // custom: CustomAdapterRegistry,
 };
+
+if (!(provider in adapter)) {
+  logger.error(`Adapter not found for ${provider}`);
+  throw new AppError("DB_PROVIDER_NOT_SUPPORTED");
+}
 
 export type DatabaseProvider = keyof typeof adapter;

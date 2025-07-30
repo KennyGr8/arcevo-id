@@ -1,0 +1,15 @@
+model LoginAttempt {
+  id              String    @id @default(uuid())
+  email           String?
+  userId          String?
+  user            User?     @relation(fields: [userId], references: [id])
+  ip              String?
+  userAgent       String?
+  success         Boolean   @default(false)
+  reason          String?
+  createdAt       DateTime  @default(now())
+
+  @@index([userId])
+  @@index([email])
+  @@index([success])
+}

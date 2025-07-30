@@ -1,5 +1,4 @@
-import { prisma, AdminAuditLogModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, AdminAuditLogModel } from "@database/logic";
 import type { IAdminAuditLogAdapter } from "@interfaces/database";
 
 export const PrismaAdminAuditLogAdapter: IAdminAuditLogAdapter<AdminAuditLogModel> = {

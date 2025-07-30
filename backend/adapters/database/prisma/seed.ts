@@ -1,59 +1,56 @@
-import path from 'node:path';
-import { readdir } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
-import chalk from 'chalk';
+import { prisma } from '@database/logic';
 import { logger } from '@utils/logger';
-import { prisma } from '@database/prisma';
 
-const seedsPath = path.resolve('adapters/database/prisma/seeds');
+// Seeder imports
+import seedUsers from './seeds/user.seed';
+import seedSessions from './seeds/session.seed';
+import seedSubscriptions from './seeds/subscription.seed';
+import seedAuthLogs from './seeds/auth-log.seed';
+import seedActivityLogs from './seeds/activity-log.seed';
+import seedAdminAuditLogs from './seeds/admin-audit-log.seed';
+import seedBillingEvents from './seeds/billing-event.seed';
+import seedOAuthAccounts from './seeds/oauth-account.seed';
+import seedEmailTokens from './seeds/email-token.seed';
+import seedOrganizations from './seeds/organization.seed';
+import seedOrganizationMemberships from './seeds/organization-membership.seed';
+import seedMFA from './seeds/mfa.seed';
 
-async function runSeeds() {
-  try {
-    const seedFiles = (await readdir(seedsPath)).filter((file) =>
-      file.endsWith('.seed.ts')
-    );
+const seedMap = {
+  users: seedUsers,
+  sessions: seedSessions,
+  subscriptions: seedSubscriptions,
+  authLogs: seedAuthLogs,
+  activityLogs: seedActivityLogs,
+  adminAuditLogs: seedAdminAuditLogs,
+  billingEvents: seedBillingEvents,
+  oauthAccounts: seedOAuthAccounts,
+  emailTokens: seedEmailTokens,
+  organizations: seedOrganizations,
+  orgMemberships: seedOrganizationMemberships,
+  mfa: seedMFA,
+};
 
-    if (seedFiles.length === 0) {
-      logger.warn(chalk.yellow('⚠️ No seed files found.'));
-      return;
-    }
+export async function runAllSeeds() {
+  logger.info('🌱 Starting full seeding process...\n');
 
-    logger.info(chalk.cyan(`📂 Found ${seedFiles.length} seed file(s)`));
+  const users = await seedMap.users(prisma);
+  const sessions = await seedMap.sessions(prisma, users);
+  const subscriptions = await seedMap.subscriptions(prisma, users);
+  const authLogs = await seedMap.authLogs(prisma, users);
+  const activityLogs = await seedMap.activityLogs(prisma, users);
+  const adminLogs = await seedMap.adminAuditLogs(prisma, users);
+  const billingEvents = await seedMap.billingEvents(prisma, subscriptions);
+  const oauthAccounts = await seedMap.oauthAccounts(prisma, users);
+  const emailTokens = await seedMap.emailTokens(prisma, users);
+  const orgs = await seedMap.organizations(prisma);
+  const memberships = await seedMap.orgMemberships(prisma, users, orgs);
+  const mfas = await seedMap.mfa(prisma, users);
 
-    for (const file of seedFiles) {
-      const filePath = path.join(seedsPath, file);
-      const fileUrl = pathToFileURL(filePath).href;
-
-      try {
-        const module = await import(fileUrl);
-        const fn = module.default;
-
-        if (typeof fn === 'function') {
-          logger.info(chalk.green(`🌱 Running seed: ${file}`));
-          await fn(prisma);
-          logger.info(chalk.green(`✅ Completed seed: ${file}`));
-        } else {
-          logger.warn(chalk.yellow(`⚠️ No default function exported in ${file}`));
-        }
-      } catch (err) {
-        logger.error(
-          chalk.red(`❌ Error while running seed: ${file}\n`) +
-            (err instanceof Error ? err.stack : String(err))
-        );
-      }
-    }
-  } catch (err) {
-    logger.error(chalk.red('❌ Error while loading seed files'), err);
-    throw err;
-  }
+  logger.info('\n✅ All data seeded successfully!');
 }
 
-runSeeds()
-  .then(() => {
-    logger.info(chalk.blueBright('\n🎉 All seeds completed successfully.\n'));
-    process.exit(0);
-  })
-  .catch((err) => {
-    logger.error(chalk.redBright('\n🔥 Seeding failed.\n'));
-    process.exit(1);
-  });
+export async function runSelectedSeed(name: keyof typeof seedMap) {
+  logger.info(`🔹 Running only: ${name}`);
+  const result = await seedMap[name](prisma);
+  return result;
+}

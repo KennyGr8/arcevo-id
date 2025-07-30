@@ -1,3 +1,5 @@
+// src/database/utils/neon-query.ts
+
 import { neon } from "@database";
 
 export async function findAll<T>(table: string): Promise<T[]> {

@@ -1,15 +1,12 @@
-import { PrismaClient } from '@prisma/client';
 import { generateFakeUser } from '@utils/faker.utils';
+import { insertInChunks } from '@utils/array.utils';
 
-export default async function seedUsers(prisma: PrismaClient) {
-  console.log('👤 Seeding users...');
+export default async function seedUsers(prisma) {
+  const usersData = Array.from({ length: 100 }, () => generateFakeUser());
 
-  const users = Array.from({ length: 5 }).map(() => generateFakeUser());
+  await insertInChunks(usersData, 25, async (chunk) => {
+    await prisma.user.createMany({ data: chunk });
+  });
 
-  const createdUsers = await Promise.all(
-    users.map((data) => prisma.user.create({ data }))
-  );
-
-  console.log(`✅ Seeded ${createdUsers.length} users`);
-  return createdUsers;
+  return await prisma.user.findMany();
 }

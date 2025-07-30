@@ -1,6 +1,5 @@
 import type { IOrganizationAdapter } from "@interfaces/database";
-import type { prisma, OrganizationModel } from "@database";
-import * as DTO from "@contracts/generated/dto/organization.dto";
+import type { prisma, OrganizationModel } from "@database/logic";
 
 export const PrismaOrganizationAdapter: IOrganizationAdapter<OrganizationModel> = {
   async createOrganization(data: DTO.CreateOrganizationDto) {

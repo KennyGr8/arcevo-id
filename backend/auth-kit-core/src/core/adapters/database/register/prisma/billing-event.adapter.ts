@@ -1,5 +1,4 @@
-import { prisma, BillingEventModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, BillingEventModel } from "@database/logic";
 import type { IBillingEventAdapter } from "@interfaces/database";
 
 export const PrismaBillingEventAdapter: IBillingEventAdapter<BillingEventModel> = {

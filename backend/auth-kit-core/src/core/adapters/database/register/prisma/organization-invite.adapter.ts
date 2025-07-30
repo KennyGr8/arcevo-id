@@ -1,5 +1,4 @@
-import { prisma, OrganizationInviteModel } from "@database";
-import * as DTO from "@contracts/generated/dto";
+import { prisma, OrganizationInviteModel } from "@database/logic";
 import type { IOrganizationInviteAdapter } from "@interfaces/database";
 
 export const PrismaOrganizationInviteAdapter: IOrganizationInviteAdapter<OrganizationInviteModel> = {

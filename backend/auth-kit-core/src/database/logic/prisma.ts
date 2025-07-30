@@ -1,4 +1,4 @@
-// auth-kit-core/src/database/prisma.ts
+// auth-kit-core/src/database/logic/prisma.ts
 
 import { PrismaClient, User, Session, MFA, MFA_BackupCode, AuthLog, ActivityLog, AdminAuditLog, OAuthAccount, EmailToken, Subscription, BillingEvent, Organization, OrganizationDomain, OrganizationInvite, OrganizationMembership, OrganizationSSOProvider } from "@generated/prisma";
 import { config } from "@database/config";

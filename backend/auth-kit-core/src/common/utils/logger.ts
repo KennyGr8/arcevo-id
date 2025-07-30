@@ -1,4 +1,6 @@
+// @utils/logger.ts
 import { createLogger, format, transports } from 'winston';
+import chalk from 'chalk';
 import 'winston-daily-rotate-file';
 import { config } from '@database/config';
 
@@ -24,7 +26,9 @@ const baseLogger = createLogger({
   ],
 });
 
-// Extend logger with `success` method
 export const logger = Object.assign(baseLogger, {
-  success: (msg: string) => baseLogger.info(`✅ ${msg}`),
+  success: (msg: string) => baseLogger.info(chalk.greenBright(`✅ ${msg}`)),
+  info: (msg: string) => baseLogger.info(chalk.cyan(msg)),
+  warn: (msg: string) => baseLogger.warn(chalk.yellowBright(`⚠️ ${msg}`)),
+  error: (msg: string) => baseLogger.error(chalk.redBright(`❌ ${msg}`)),
 });
